@@ -52,23 +52,21 @@ class Post extends Model
         return $this->hasMany(PostComment::class);
     }
 
-    public function scopeWithReactionCounts($query)
+    public function scopeWithReactionCounts(Builder $query)
     {
         return $query->select('posts.*')
             ->selectSub(function ($query) {
                 $query->from('post_reactions')
                     ->selectRaw(' COUNT(CASE WHEN type = "LIKE" THEN 1 ELSE 0 END) as like_count')
                     ->whereColumn('post_id', 'posts.id')
-                    ->where('type', 'LIKE') // Considera apenas type igual a 'LIKE'
-                    ->whereNull('deleted_at')
+                    ->where('type', 'LIKE')
                     ->groupBy('post_id');
             }, 'like_count')
             ->selectSub(function ($query) {
                 $query->from('post_reactions')
                     ->selectRaw('COUNT(CASE WHEN type = "UNLIKE" THEN 1 ELSE 0 END) as unlike_count')
                     ->whereColumn('post_id', 'posts.id')
-                    ->where('type', 'UNLIKE') // Considera apenas type igual a 'UNLIKE'
-                    ->whereNull('deleted_at')
+                    ->where('type', 'UNLIKE')
                     ->groupBy('post_id');
             }, 'unlike_count');
     }

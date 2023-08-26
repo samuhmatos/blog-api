@@ -73,6 +73,11 @@ class PaginationPresenter implements PaginationInterface
         return $this->paginator->previousPageUrl();
     }
 
+    public function getLastPage(): int
+    {
+        return $this->paginator->lastPage();
+    }
+
     private function resolveItems(array $items): array
     {
         $response = [];

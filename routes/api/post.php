@@ -7,10 +7,11 @@ use App\Http\Controllers\PostReactionController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/posts', [PostController::class, 'index']);
-Route::get('/posts/feed', [PostController::class, 'feed']);
 
 Route::prefix('/post')->group(function(){
+    Route::get('', [PostController::class, 'index']);
+    Route::get('/feed', [PostController::class, 'feed']);
+
     Route::get('/{category:slug}/{post}',[PostController::class, 'show']);
 
     Route::post('/{post}/view',[PostController::class, 'storeView']);

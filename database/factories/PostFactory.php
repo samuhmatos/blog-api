@@ -22,8 +22,8 @@ class PostFactory extends Factory
         $users = User::query()->where('is_admin',1)->get();
         $category = PostCategory::all();
 
-        $title = fake()->text(150);
-        
+        $title = fake()->text(120);
+
         return [
             'title'=> $title,
             'sub_title'=> fake()->text(),

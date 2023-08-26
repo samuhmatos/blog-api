@@ -17,4 +17,5 @@ interface PaginationInterface
     public function getNumberPerPage(): int;
     public function getNextPageUrl(): string|null;
     public function getPreviousPageUrl(): string|null;
+    public function getLastPage(): int;
 }

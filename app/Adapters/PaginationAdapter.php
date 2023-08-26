@@ -18,6 +18,7 @@ class PaginationAdapter{
                 'previous_page' => $data->getNumberPreviousPage(),
                 'next_page_url'=> $data->getNextPageUrl(),
                 'previous_page_url'=> $data->getPreviousPageUrl(),
+                'last_page'=> $data->getLastPage(),
             ],
             'data'=> $data->items()
         ];

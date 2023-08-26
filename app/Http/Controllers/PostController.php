@@ -9,6 +9,7 @@ use App\Models\PostCategory;
 use App\Services\PostServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PostController extends Controller
 {
@@ -19,19 +20,22 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = $request->query('q');
         $args = [
             'recent' => PaginationAdapter::toJson($this->postServices->paginateRecent(perPage: 10)),
             'popular'=> $this->postServices->getPopular(),
             'trendVideos'=> $this->postServices->getTrendVideos(),
             'reviews'=> $this->postServices->getLatestReviews(),
-            //'best'=> $this->postServices->getLatestBest(),
+            'best'=> $this->postServices->getLatestBest(),
             'technology'=> $this->postServices->getBestTechnology()
         ];
 
-        //dd($args);
-        return response($args);
+        if(array_key_exists($query, $args))
+            return response($args[$query]);
+        else
+            throw new NotFoundHttpException("Not Found Param");
     }
 
     public function feed(Request $request)

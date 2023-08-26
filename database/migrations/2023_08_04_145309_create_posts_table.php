@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     protected $dependsOn = [
-        
+
     ];
 
     /**
@@ -17,8 +17,8 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('title',150)->unique();
-            $table->string('sub_title');
+            $table->string('title',120)->unique();
+            $table->string('sub_title', 200);
             $table->string('slug')->unique();
             $table->text('content');
             $table->string('image_url');

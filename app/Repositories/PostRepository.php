@@ -51,7 +51,8 @@ use Illuminate\Support\Facades\DB;
 
         }
 
-        public function getLatestReviews(){
+        public function getLatestReviews()
+        {
             return Post::with(['category', 'author'])
                 ->withReactionCounts()
                 ->join('post_categories', 'post_categories.id', '=', 'posts.category_id')
@@ -61,7 +62,8 @@ use Illuminate\Support\Facades\DB;
                 ->get();
         }
 
-        public function getLatestBest(){
+        public function getLatestBest()
+        {
             return Post::with(['category', 'author'])
                 ->withReactionCounts()
                 ->orderByDesc('like_count')
@@ -70,7 +72,8 @@ use Illuminate\Support\Facades\DB;
                 ->get();
         }
 
-        public function getBestTechnology() {
+        public function getBestTechnology()
+        {
             return Post::with(['category', 'author'])
                 ->withReactionCounts()
                 ->join('post_categories', 'post_categories.id', '=', 'posts.category_id')
@@ -80,7 +83,8 @@ use Illuminate\Support\Facades\DB;
                 ->get();
         }
 
-        public function getPostBySlug(string $slug){
+        public function getPostBySlug(string $slug)
+        {
             return Post::with(['author', 'comments.user', "category"])
                 ->withReactionCounts()
                 ->where('slug',$slug)

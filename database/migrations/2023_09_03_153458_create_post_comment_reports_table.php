@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contacts', function (Blueprint $table) {
+        Schema::create('post_comment_reports', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
-            $table->string('name', 100);
-            $table->string('phone',20)->unique()->nullable();
-            $table->string('subject', 100);
-            $table->string('message');
+            $table->foreignId('comment_id')->references('id')->on('post_comments')->cascadeOnDelete();
+            $table->foreignId('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->string("reason");
+            $table->boolean('approved')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contacts');
+        Schema::dropIfExists('post_comment_reports');
     }
 };

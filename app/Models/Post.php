@@ -29,7 +29,7 @@ class Post extends Model
     ];
 
     protected $casts = [
-        'seila' => 'date:Y-m-d',
+
     ];
 
     public function category():BelongsTo
@@ -52,7 +52,7 @@ class Post extends Model
         return $this->hasMany(PostComment::class);
     }
 
-    public function scopeWithReactionCounts(Builder $query)
+    public function scopeWithPostReactionCounts(Builder $query)
     {
         return $query->select('posts.*')
             ->selectSub(function ($query) {
@@ -70,11 +70,5 @@ class Post extends Model
                     ->groupBy('post_id');
             }, 'unlike_count');
     }
-
-    protected function serializeDate(DateTimeInterface $date): string
-    {
-        return $date->format('Y-m-d');
-    }
-
 
 }

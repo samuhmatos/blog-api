@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class LoginRequest extends FormRequest
 {
@@ -44,8 +46,11 @@ class LoginRequest extends FormRequest
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            //throw new BadRequestHttpException("Email ou senha incorretos!");
+
+
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'email' => __('Email ou senha incorretos!'),
             ]);
         }
 

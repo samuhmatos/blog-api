@@ -20,6 +20,8 @@ class ContactFactory extends Factory
             'email'=> fake()->unique()->safeEmail(),
             'name'=> fake()->name(),
             'phone'=> fake()->phoneNumber(),
+            'subject'=> fake()->realText(80),
+            'message'=> fake()->realText(255)
         ];
     }
 }

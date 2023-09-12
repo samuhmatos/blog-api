@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 
 class PostCommentController extends Controller
 {
+    public function index(Post $post)
+    {
+        $postComments = PostComment::with(['user', 'answers.user'])->where('post_id', $post->id)->where('parent_id', null)->get();
+
+        return response($postComments);
+    }
     public function store(Request $request, Post $post)
     {
         $request->validate([
@@ -19,8 +25,8 @@ class PostCommentController extends Controller
         $payload['user_id'] = auth()->user()->id;
         $payload['post_id'] = $post->id;
 
-        $postComment = PostComment::create($payload);
-
+        $postComment = PostComment::query()->create($payload);
+        $postComment = $postComment->refresh()->load(['user', 'parent']);
         return response($postComment, 201);
     }
 
@@ -35,6 +41,7 @@ class PostCommentController extends Controller
 
         $postComment->comment = $request->input('comment');
         $postComment->save();
+        $postComment->load('user');
 
         return response($postComment, 201);
     }

@@ -20,9 +20,7 @@ class PostCommentPolicy
 
     public function matchPost(User $user, PostComment $postComment, Post $post)
     {
-        return $post->id === $postComment->post_id
-        ? Response::allow()
-        : Response::deny("The post and comment informed does not match", 400);
+        return $post->id === $postComment->post_id;
     }
 
     public function matchUser(User $user, PostComment $postComment)

@@ -19,15 +19,19 @@ class PostCommentFactory extends Factory
      */
     public function definition(): array
     {
-        $actualData = PostComment::all();
-        $users = User::query()->where('is_admin',1)->get();
+        $users = User::all();
         $posts = Post::all();
 
+        $randomPost = $posts->random()->id;
+        $randomUser = $users->random()->id;
+
         return [
-            'user_id'=>  $users->random()->id,
-            'post_id'=>  $posts->random()->id,
-            'parent_id'=> rand(1,3) == 2 && $actualData->count() > 0 ? $actualData->random()->id : null,
+            'user_id'=>  $randomUser,
+            'post_id'=>  $randomPost,
+            'parent_id'=> null,
             'comment'=> fake()->realText()
         ];
     }
+
+
 }

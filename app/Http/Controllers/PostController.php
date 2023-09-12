@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Adapters\PaginationAdapter;
+use App\Enums\CategorySlug;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Models\PostCategory;
@@ -17,25 +18,37 @@ class PostController extends Controller
     public function __construct(
         protected PostServices $postServices
     ){}
-    /**
-     * Display a listing of the resource.
-     */
+
+
     public function index(Request $request)
     {
-        $query = $request->query('q');
-        $args = [
-            'recent' => PaginationAdapter::toJson($this->postServices->paginateRecent(perPage: 10)),
-            'popular'=> $this->postServices->getPopular(),
-            'trendVideos'=> $this->postServices->getTrendVideos(),
-            'reviews'=> $this->postServices->getLatestReviews(),
-            'best'=> $this->postServices->getLatestBest(),
-            'technology'=> $this->postServices->getBestTechnology()
-        ];
+        $query = $request->query('category');
 
-        if(array_key_exists($query, $args))
-            return response($args[$query]);
+        if($query == "popular"){
+            $data =  $this->postServices->getPopular();
+        }else if($query == "best"){
+            $data = $this->postServices->getLatestBest();
+        }else{
+            $data = $this->postServices->getByCategory($query);
+        }
+
+        // $args = [
+        //     'popular' => $this->postServices->getPopular(),
+        //     'best'=> $this->postServices->getLatestBest(),
+        //     'videos'=> $this->postServices->getByCategory(CategorySlug::videos),
+        //     'reviews'=> $this->postServices->getByCategory(CategorySlug::reviews),
+        //     'technology'=> $this->postServices->getByCategory(CategorySlug::tech)
+        // ];
+
+        // if(array_key_exists($query, $args))
+        //     return response($args[$query]);
+        // else
+        //     throw new NotFoundHttpException("Not Found category");
+
+        if($data)
+            return response($data);
         else
-            throw new NotFoundHttpException("Not Found Param");
+            throw new NotFoundHttpException("Not Found category");
     }
 
     public function feed(Request $request)
@@ -44,13 +57,20 @@ class PostController extends Controller
         $perPage = $request->query('per_page', 10);
         $search = $request->query('search');
 
-        return response(PaginationAdapter::toJson($this->postServices->paginateRecent(page:$page, perPage: $perPage, search: $search)));
+        return response(PaginationAdapter::toJson($this->postServices->paginateFeed(page:$page, perPage: $perPage, search: $search)));
     }
 
-    public function storeView(Request $request, Post $post)
+    public function suggestion()
     {
-        $views = $post->views + 1;
-        $post->views = $views;
+        $posts = $this->postServices->getPopular(15);
+
+        return response($posts->random(2));
+    }
+
+    public function storeView(Post $post)
+    {
+        //$views = $post->views + 1;
+        $post->views += 1;
         $post->save();
 
         return response(['views'=> $post->views], 201);
@@ -76,14 +96,10 @@ class PostController extends Controller
         return response($post, 201);
     }
 
-    public function show(PostCategory $category, string $post)
+    public function show(string $slug)
     {
-        //PostCategory::query()->where('slug',$category)->firstOrFail();
-
-        $post = $this->postServices->getPostBySlug($post);
-
+        $post = $this->postServices->getPostBySlug($slug);
         return response($post);
-
     }
 
 

@@ -11,9 +11,13 @@ use Illuminate\Validation\Rules\Enum;
 
 class PostReactionController extends Controller
 {
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function show(Request $request, Post $post)
+    {
+        $reaction = PostReaction::query()->where('post_id', $post->id)->where('user_id', $request->user()->id)->first();
+
+        return response($reaction);
+    }
+
     public function store(Request $request, Post $post)
     {
         $request->validate([

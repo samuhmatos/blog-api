@@ -16,6 +16,7 @@ class CreatePostTest extends TestCase
     use RefreshDatabase;
     public function test_it_should_create_a_post(): void
     {
+        $this->seed();
         $user = User::factory()->set('is_admin', true)->create();
 
         Template::factory()->create();

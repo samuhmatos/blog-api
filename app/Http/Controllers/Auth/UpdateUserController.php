@@ -18,29 +18,37 @@ class UpdateUserController extends Controller
         $request->validate([
             'name' => ['string', "max:100"],
             'username' => ['string', "max:255", "unique:users,username"],
-            "image" => ['image', "max:5"],
+            "image" => ['image', "max:5000"],
             "email"=> ["email", "unique:users,id"]
         ]);
         $payload = $request->only(['name', 'username', 'email']);
         $image = $request->file('image');
 
+        //return ($image);
+
         if($image){
-            Storage::delete($user->image_url);
-            $payload['image_url'] = $image->store('/uploads/users/');
+            if($user->image_url) {
+                Storage::delete($user->image_url);
+            }
+
+            $payload['image_url'] = $image->store('/uploads/users');
+            //$user->image_url = $image->store('/uploads/users');
         }
 
-        $contact = Contact::query()->where("email", $user->email)->first();
+       // $contact = Contact::query()->where("email", $user->email)->first();
 
         $user->update($payload);
         $user->fresh();
 
-        $contact->update([
-            'name' => $user->name,
-            "email" => $user->email,
-        ]);
+        // $contact->update([
+        //     'name' => $user->name,
+        //     "email" => $user->email,
+        // ]);
 
-        if($request->email)
+        if($request->email){
+            $user->tokens()->delete();
             $token = $user->createToken('user_auth')->plainTextToken;
+        }
 
         return response([
             'user' => $user,

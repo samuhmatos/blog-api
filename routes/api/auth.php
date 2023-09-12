@@ -34,9 +34,9 @@ Route::post('/email/verification-notification', [EmailVerificationNotificationCo
                 ->middleware(['auth', 'throttle:6,1'])
                 ->name('verification.send');
 
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+Route::delete('/logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->middleware('auth:sanctum')
                 ->name('logout');
 
-Route::put('/user/{user}', [UpdateUserController::class, 'store'])->middleware('auth:sanctum');
+Route::post('/user/{user}', [UpdateUserController::class, 'store'])->middleware('auth:sanctum');
 Route::delete('/user/{user}', [DeleteUserController::class, 'destroy'])->middleware('auth:sanctum');

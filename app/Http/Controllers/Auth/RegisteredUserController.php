@@ -50,15 +50,13 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
-        $token = $request->user()->createToken('user_auth');
-        $csrf = csrf_token();
+        $token = $request->user()->createToken('user:register');
 
 
         return response(
             [
                 'user' => $request->user(),
                 'token' => $token->plainTextToken,
-                'csrf' => $csrf
             ]
         ,201);
     }

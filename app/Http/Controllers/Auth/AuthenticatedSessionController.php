@@ -28,15 +28,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->authenticate();
 
-        $token = $request->user()->createToken('user_auth');
-        $csrf = csrf_token();
+        $token = $request->user()->createToken('user:login');
         //$request->session()->regenerate();
 
         return response(
             [
                 'user' => $request->user(),
                 'token' => $token->plainTextToken,
-                'csrf' => $csrf
             ]
         );
     }

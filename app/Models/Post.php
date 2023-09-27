@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\ImageUrlCast;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,6 +23,7 @@ class Post extends Model
         'image_url',
         'category_id',
         'author_id',
+        'is_draft'
     ];
 
     protected $hidden = [
@@ -29,7 +31,8 @@ class Post extends Model
     ];
 
     protected $casts = [
-
+        'image_url' => ImageUrlCast::class,
+        'is_draft' => 'boolean'
     ];
 
     public function category():BelongsTo

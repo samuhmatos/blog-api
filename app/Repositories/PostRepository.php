@@ -12,16 +12,24 @@ class PostRepository{
         protected Post $post
     ){}
 
-    public function paginateFeed(int $page = 1, int $perPage = 15, string $filter = null): PaginationInterface
+    public function paginateFeed(
+        int $page,
+        int $perPage,
+        string|null $filter,
+        bool $isDraft
+    ): PaginationInterface
     {
         $result = Post::with(['category', 'author'])
             ->withPostReactionCounts()
-            ->where(function ($query) use ($filter) {
+            ->where(function ($query) use ($filter, $isDraft) {
                 if ($filter) {
                     $query->where('title', 'like', "%{$filter}%");
                     $query->orWhere('sub_title', 'like', "%{$filter}%");
                 }
+
+                $query->where('is_draft', $isDraft);
             })
+            ->orderByDesc('created_at')
             ->paginate($perPage, ['*'], 'page', $page);
 
         return new PaginationPresenter($result);
@@ -57,11 +65,12 @@ class PostRepository{
             ->get();
     }
 
-    public function getPostBySlug(string $slug): Post
+    public function getOne(string|int $param): Post
     {
         return Post::with(['author', 'category'])
             ->withPostReactionCounts()
-            ->where('slug', $slug)
+            ->where('slug', $param)
+            ->orWhere('id', $param)
             ->firstOrFail()
             ->load(['comments' => function ($query) {
                 $query

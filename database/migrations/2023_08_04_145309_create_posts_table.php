@@ -23,7 +23,7 @@ return new class extends Migration
             $table->text('content');
             $table->string('image_url');
             $table->integer('views')->default(0);
-            //$table->string('tags')->nullable();
+            $table->boolean('is_draft')->default(false);
             $table->foreignId('category_id')->references('id')->on('post_categories')->cascadeOnDelete();
             $table->foreignId('author_id')->references('id')->on('users')->cascadeOnDelete();
             $table->timestamps();
@@ -39,3 +39,5 @@ return new class extends Migration
         Schema::dropIfExists('posts');
     }
 };
+
+//TODO: create tags column

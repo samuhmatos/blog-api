@@ -10,9 +10,19 @@ class PostServices{
         protected PostRepository $postRepository
     ){}
 
-    public function paginateFeed(int $page = 1, int $perPage = 15, string|null $search = null)
+    public function paginateFeed(
+        int $page = 1,
+        int $perPage = 15,
+        string|null $search = null,
+        bool $isDraft = false
+    )
     {
-        return $this->postRepository->paginateFeed(page:$page, perPage: $perPage, filter: $search);
+        return $this->postRepository->paginateFeed(
+            page:$page,
+            perPage: $perPage,
+            filter: $search,
+            isDraft: $isDraft
+        );
     }
 
     public function getPopular(int $limit = 3):Collection
@@ -25,9 +35,9 @@ class PostServices{
         return $this->postRepository->getLatestBest();
     }
 
-    public function getPostBySlug(string $slug): Post
+    public function getOne(string|int $param): Post
     {
-        return $this->postRepository->getPostBySlug($slug);
+        return $this->postRepository->getOne($param);
     }
 
     public function getByCategory(string $categorySlug, int $limit = 3): Collection | Post

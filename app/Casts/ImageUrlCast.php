@@ -15,10 +15,16 @@ class ImageUrlCast implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        if($value)
-            return Storage::url($value);
-        else
+        if($value){
+            if(!str($value)->isUrl()){
+                return Storage::url($value);
+            }
+
+            return $value;
+        }else{
             return null;
+        }
+        // 'http://localhost:8000/storage/uploads/posts/banners//l9PAihmMRCyfEqQ1UaoLYOgZNT208L76SabeUAXZ.png'
     }
 
     /**

@@ -13,7 +13,9 @@ class PostCategoryController extends Controller
     {}
     public function index()
     {
-        //
+        $postCategory = PostCategory::all();
+
+        return response($postCategory);
     }
 
     /**

@@ -32,9 +32,11 @@ class PostRequest extends FormRequest
             'content'=> ['required','string'],
             'banner'=> [
                 Rule::requiredIf($this->method() === "POST"),
-                'image'
+                'image',
+                'max:500000'
             ],
-            'category_id'=> ['required','integer', 'exists:post_categories,id']
+            'category_id'=> ['required','integer', 'exists:post_categories,id'],
+            'is_draft'=>['required','boolean']
         ];
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Post;
 use App\Models\PostCategory;
 use App\Services\PostServices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -19,6 +20,24 @@ class PostController extends Controller
         protected PostServices $postServices
     ){}
 
+    private function paginate(
+        int $page,
+        int $perPage,
+        string|null $search,
+        bool $isDraft,
+    )
+    {
+        return response(
+            PaginationAdapter::toJson(
+                $this->postServices->paginateFeed(
+                    page:$page,
+                    perPage: $perPage,
+                    search: $search,
+                    isDraft: $isDraft
+                )
+            )
+        );
+    }
 
     public function index(Request $request)
     {
@@ -51,13 +70,25 @@ class PostController extends Controller
             throw new NotFoundHttpException("Not Found category");
     }
 
-    public function feed(Request $request)
+    public function paginateFeed(Request $request)
     {
         $page =  $request->query('page', 1);
         $perPage = $request->query('per_page', 10);
         $search = $request->query('search');
 
-        return response(PaginationAdapter::toJson($this->postServices->paginateFeed(page:$page, perPage: $perPage, search: $search)));
+        return $this->paginate($page, $perPage, $search, false);
+    }
+
+    public function paginateDrafts(Request $request)
+    {
+        $this->authorize('is_admin');
+
+        $page =  $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $search = $request->query('search');
+
+        return $this->paginate($page, $perPage, $search, true);
+
     }
 
     public function suggestion()
@@ -69,7 +100,6 @@ class PostController extends Controller
 
     public function storeView(Post $post)
     {
-        //$views = $post->views + 1;
         $post->views += 1;
         $post->save();
 
@@ -82,23 +112,42 @@ class PostController extends Controller
         $request->validate(['title'=> 'unique:posts']);
         $this->authorize('is_admin');
 
-        $payload = $request->only(['title', 'sub_title', 'content', 'category_id']);
+        $payload = $request->only(['title', 'sub_title', 'content', 'category_id', 'is_draft']);
         $banner = $request->file('banner');
-        $image_url = $banner->store('/uploads/posts/banners/');
+
+        if($banner){
+            $image_url = $banner->store('/uploads/posts/banners');
+            $payload['image_url'] = $image_url;
+        }
 
         $payload['slug'] = str()->slug($payload['title']);
         $payload['author_id'] = auth()->user()->id;
-        $payload['image_url'] = $image_url;
 
         $post = Post::create($payload);
-
 
         return response($post, 201);
     }
 
-    public function show(string $slug)
+    public function uploadSourceContent(Request $request)
     {
-        $post = $this->postServices->getPostBySlug($slug);
+        $this->authorize('is_admin');
+        $request->validate([
+            'file' => ['required', 'image', 'max:500000']
+        ]);
+
+        $file = $request->file('file');
+        $fileStored = $file->store('/uploads/posts/contents');
+        $file = Storage::url($fileStored);
+
+        return response([
+            'url' => $file
+        ]);
+
+    }
+
+    public function show(string $param)
+    {
+        $post = $this->postServices->getOne($param);
         return response($post);
     }
 

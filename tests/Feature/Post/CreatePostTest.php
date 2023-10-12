@@ -4,7 +4,6 @@ namespace Tests\Feature\Post;
 
 use App\Models\Post;
 use App\Models\PostCategory;
-use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -19,7 +18,6 @@ class CreatePostTest extends TestCase
         $this->seed();
         $user = User::factory()->set('is_admin', true)->create();
 
-        Template::factory()->create();
         $category = PostCategory::factory()->create();
 
         Storage::fake('post_banner');
@@ -31,6 +29,7 @@ class CreatePostTest extends TestCase
             'sub_title'=> "This is the sub title's post",
             'content' => "This is the content of the post",
             'banner'=> $file,
+            'is_draft' => rand(1,2) == 2 ? true : false,
             'category_id'=> $category->id
         ];
 
@@ -51,7 +50,6 @@ class CreatePostTest extends TestCase
     public function test_it_should_return_401_when_user_is_not_authenticated(){
         $user = User::factory()->set('is_admin', true)->create();
 
-        Template::factory()->create();
         PostCategory::factory()->create();
 
         Storage::fake('post_banner');
@@ -62,6 +60,7 @@ class CreatePostTest extends TestCase
             'title' => "This is the title's post",
             'sub_title'=> "This is the sub title's post",
             'content' => "This is the content of the post",
+            'is_draft' => rand(1,2) == 2 ? true : false,
             'banner'=> $file,
             'category_id'=> 1
         ];
@@ -75,7 +74,6 @@ class CreatePostTest extends TestCase
     {
         $user = User::factory()->set('is_admin', false)->create();
 
-        Template::factory()->create();
         $category = PostCategory::factory()->create();
 
         Storage::fake('post_banner');
@@ -87,7 +85,8 @@ class CreatePostTest extends TestCase
             'sub_title'=> "This is the sub title's post",
             'content' => "This is the content of the post",
             'banner'=> $file,
-            'category_id'=> $category->id
+            'category_id'=> $category->id,
+            'is_draft' => rand(1,2) == 2 ? true : false,
         ];
 
         $response = $this->actingAs($user)->postJson('/api/post', $post);
@@ -100,7 +99,6 @@ class CreatePostTest extends TestCase
         User::factory()->set('is_admin', true)->create();
         $user = User::factory()->create();
 
-        Template::factory()->create();
         PostCategory::factory()->create();
 
         $post = Post::factory()->set('views', 0)->create();

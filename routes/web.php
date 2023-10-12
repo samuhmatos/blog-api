@@ -19,5 +19,15 @@ Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
 
+// Route::get('/storage/uploads/posts/banners/{filename}', function ($filename) {
+//     $path = storage_path("app/public/uploads/posts/banners/{$filename}");
 
+//     if (!Storage::exists("public/uploads/posts/banners/{$filename}")) {
+//         abort(404);
+//     }
 
+//     $file = Storage::get("public/uploads/posts/banners/{$filename}");
+//     $type = Storage::mimeType("public/uploads/posts/banners/{$filename}");
+
+//     return response()->make($file, 200, ['Content-Type' => $type]);
+// });

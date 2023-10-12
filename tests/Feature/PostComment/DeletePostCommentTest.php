@@ -6,12 +6,17 @@ use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class DeletePostCommentTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function path(int $postId, int $commentId):string
+    {
+        return "/api/post/{$postId}/comment/{$commentId}/";
+    }
+
     public function test_it_should_delete_a_post_comment(): void
     {
         $this->seed();
@@ -24,7 +29,8 @@ class DeletePostCommentTest extends TestCase
             ->set('user_id', $userCommentOwner->id)
             ->create();
 
-        $response = $this->actingAs($userCommentOwner)->deleteJson("/api/post/{$post->id}/comment/{$postComment->id}");
+        $response = $this->actingAs($userCommentOwner)
+            ->deleteJson($this->path($post->id, $postComment->id));
 
         $response->assertNoContent();
     }
@@ -35,7 +41,12 @@ class DeletePostCommentTest extends TestCase
         $user = User::first();
         $post = Post::first();
 
-        $response = $this->actingAs($user)->deleteJson("/api/post/{$post->id}/comment/20");
+        while ($user->id == $post->user_id) {
+            $post = Post::first();
+        }
+
+        $response = $this->actingAs($user)
+            ->deleteJson($this->path($post->id, 20));
 
         $response->assertForbidden();
     }
@@ -52,7 +63,8 @@ class DeletePostCommentTest extends TestCase
             ->set('user_id', $userCommentOwner->id)
             ->create();
 
-        $response = $this->actingAs($user)->deleteJson("/api/post/{$post->id}/comment/{$postComment->id}");
+        $response = $this->actingAs($user)
+            ->deleteJson($this->path($post->id, $postComment->id));
 
         $response->assertForbidden();
     }
@@ -63,7 +75,7 @@ class DeletePostCommentTest extends TestCase
         $post = Post::first();
         $postComment = PostComment::factory()->set('post_id', $post->id)->create();
 
-        $response = $this->deleteJson("/api/post/{$post->id}/comment/{$postComment->id}");
+        $response = $this->deleteJson($this->path($post->id, $postComment->id));
 
         $response->assertUnauthorized();
     }

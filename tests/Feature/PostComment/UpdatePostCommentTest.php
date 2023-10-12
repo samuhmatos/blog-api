@@ -5,7 +5,6 @@ namespace Tests\Feature\PostComment;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\PostComment;
-use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -35,7 +34,6 @@ class UpdatePostCommentTest extends TestCase
         $response = $this->actingAs($userCommentOwner)->patchJson("/api/post/{$post->id}/comment/{$postComment->id}", $payload);
 
         $response->assertCreated();
-        $response->dump();
     }
 
     public function test_it_should_return_403_when_providing_not_match_path(): void
@@ -58,7 +56,6 @@ class UpdatePostCommentTest extends TestCase
         $userCommentOwner = User::factory()->create();
         $user = User::factory()->set('is_admin', true)->create();
 
-        Template::factory()->create();
         PostCategory::factory()->create();
         $post = Post::factory()->create();
         $postComment = PostComment::factory()

@@ -27,6 +27,5 @@ class UpdatePostCommentReactionTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/comment/{$postComment->id}/reaction", $payload);
 
         $response->assertCreated();
-        $response->dump();
     }
 }

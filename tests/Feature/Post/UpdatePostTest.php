@@ -4,7 +4,6 @@ namespace Tests\Feature\Post;
 
 use App\Models\Post;
 use App\Models\PostCategory;
-use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -17,7 +16,6 @@ class UpdatePostTest extends TestCase
     use RefreshDatabase, WithFaker;
     public function test_it_should_update_a_post(): void
     {
-        Template::factory()->create();
         $categories = PostCategory::factory()->count(3)->create();
         $user = User::factory()->set('is_admin', true)->create();
         $post = Post::factory()->create();
@@ -31,6 +29,7 @@ class UpdatePostTest extends TestCase
             'sub_title'=> "This is the sub title's post",
             'content' => "This is the content of the post",
             'banner'=> $file,
+            'is_draft' => rand(1,2) == 2 ? true : false,
             'category_id'=> $categories->random()->id
         ];
 
@@ -40,7 +39,6 @@ class UpdatePostTest extends TestCase
     }
     public function test_it_should_return_422_when_not_providing_data():void
     {
-        Template::factory()->create();
         $categories = PostCategory::factory()->count(3)->create();
         $user = User::factory()->set('is_admin', true)->create();
         $post = Post::factory()->create();
@@ -52,7 +50,6 @@ class UpdatePostTest extends TestCase
     }
 
     public function test_it_should_return_401_when_user_is_not_authenticated(){
-        Template::factory()->create();
         $categories = PostCategory::factory()->count(3)->create();
         $user = User::factory()->set('is_admin', true)->create();
         $post = Post::factory()->create();
@@ -68,7 +65,6 @@ class UpdatePostTest extends TestCase
     {
         User::factory()->set('is_admin', true)->create();
         $user = User::factory()->set('is_admin', false)->create();
-        Template::factory()->create();
         $categories = PostCategory::factory()->count(2)->create();
         $post = Post::factory()->create();
 
@@ -80,6 +76,7 @@ class UpdatePostTest extends TestCase
             'sub_title'=> "This is the sub title's post",
             'content' => "This is the content of the post",
             'banner'=> $file,
+            'is_draft' => rand(1,2) == 2 ? true : false,
             'category_id'=> $categories->random()->id
         ];
 
@@ -92,7 +89,6 @@ class UpdatePostTest extends TestCase
     {
         User::factory()->set('is_admin', true)->create();
         $user = User::factory()->set('is_admin', false)->create();
-        Template::factory()->create();
         $categories = PostCategory::factory()->count(2)->create();
         $post = Post::factory()->create();
 
@@ -104,6 +100,7 @@ class UpdatePostTest extends TestCase
             'sub_title'=> "This is the sub title's post",
             'content' => "This is the content of the post",
             'banner'=> $file,
+            'is_draft' => rand(1,2) == 2 ? true : false,
             'category_id'=> $categories->random()->id
         ];
 

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
 
 class UpdateUserController extends Controller
 {
@@ -19,12 +20,12 @@ class UpdateUserController extends Controller
             'name' => ['string', "max:100"],
             'username' => ['string', "max:255", "unique:users,username"],
             "image" => ['image', "max:5000"],
-            "email"=> ["email", "unique:users,id"]
+            "email"=> ["email", "unique:users,id"],
+            "password" => ['confirmed', Rules\Password::defaults()]
         ]);
+
         $payload = $request->only(['name', 'username', 'email']);
         $image = $request->file('image');
-
-        //return ($image);
 
         if($image){
             if($user->image_url) {
@@ -32,7 +33,6 @@ class UpdateUserController extends Controller
             }
 
             $payload['image_url'] = $image->store('/uploads/users');
-            //$user->image_url = $image->store('/uploads/users');
         }
 
        // $contact = Contact::query()->where("email", $user->email)->first();
@@ -45,14 +45,14 @@ class UpdateUserController extends Controller
         //     "email" => $user->email,
         // ]);
 
-        if($request->email){
+        if($request->email && $request->email != $user->email){
             $user->tokens()->delete();
             $token = $user->createToken('user_auth')->plainTextToken;
         }
 
         return response([
             'user' => $user,
-            'token' => isset($token) && $token
+            'token' => isset($token) ? $token : null
         ]);
     }
 }

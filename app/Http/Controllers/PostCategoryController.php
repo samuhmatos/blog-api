@@ -6,35 +6,66 @@ use App\Adapters\PaginationAdapter;
 use App\Models\PostCategory;
 use App\Services\PostCategoryService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PostCategoryController extends Controller
 {
     public function __construct(protected PostCategoryService $postCategoryService)
     {}
-    public function index()
+    public function index(Request $request)
     {
-        $postCategory = PostCategory::all();
+        $page =  $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $is_trash = $request->query('is_trash', false);
+        $categorySlug = $request->query('category', null);
 
-        return response($postCategory);
+
+        return response(PaginationAdapter::toJson($this->postCategoryService->paginate(
+            page: $page,
+            perPage: $perPage,
+            isTrash: $is_trash,
+            categorySlug: $categorySlug
+        )));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function paginatePosts(Request $request, string $slug)
-    {
-        $page =  $request->query('page', 1);
-        $perPage = $request->query('per_page', 10);
+    // public function paginatePosts(Request $request, string $slug)
+    // {
+    //     $page =  $request->query('page', 1);
+    //     $perPage = $request->query('per_page', 10);
 
-        return response(PaginationAdapter::toJson($this->postCategoryService->paginatePostsByCategory($slug, $page, $perPage)));
+    //     return response(PaginationAdapter::toJson($this->postCategoryService->paginatePostsByCategory($slug, $page, $perPage)));
+    // }
+
+    public function store(Request $request){
+        $this->authorize('is_admin');
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:50', 'unique:post_categories,name'],
+            'description' => ['required', 'string', 'max:255']
+        ]);
+
+        $payload = $request->only('name', 'description');
+        $slug = str()->slug($payload['name']);
+
+        $alreadyExistSlug = PostCategory::where('slug', $slug)->first();
+
+        while($alreadyExistSlug){
+            $alreadyExistSlug = PostCategory::where('slug', $slug)->first();
+            $slug = $slug . rand(1,20);
+        }
+
+        $postCategory = PostCategory::create([
+            'name' => $payload['name'],
+            'slug' => $slug,
+            'description' => $payload['description']
+        ]);
+
+        return response($postCategory, 201);
+
     }
 
     public function show(PostCategory $postCategory)
@@ -48,27 +79,42 @@ class PostCategoryController extends Controller
         return response($categories);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, PostCategory $postCategory)
     {
-        //
+        $this->authorize('is_admin');
+
+
+        $request->validate([
+            'name' => [
+                'string',
+                'max:50',
+                // $payload['name'] && 'unique:post_categories,name',
+                Rule::unique('post_categories')->ignore($postCategory->id)
+            ],
+            'slug' => [
+                'string',
+                'max:255',
+                //  $payload['slug']  && 'unique:post_categories,slug',
+                Rule::unique('post_categories')->ignore($postCategory->id)
+            ],
+            'description' => ['string', 'max:255']
+        ]);
+
+        $payload = $request->only('name', 'description', 'slug');
+
+
+        $postCategory->update($payload);
+        $postCategory->fresh();
+
+        return response($postCategory);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(PostCategory $postCategory)
     {
-        //
-    }
+        $this->authorize('is_admin');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $postCategory->delete();
+
+        return response()->noContent();
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Enums\CategorySlug;
 use App\Models\Post;
 use App\Repositories\Contracts\PaginationInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class PostRepository{
@@ -12,23 +12,38 @@ class PostRepository{
         protected Post $post
     ){}
 
-    public function paginateFeed(
+    public function paginate(
         int $page,
         int $perPage,
         string|null $filter,
-        bool $isDraft
+        bool $isDraft,
+        bool $isTrash,
+        string|null $categorySlug,
     ): PaginationInterface
     {
-        $result = Post::with(['category', 'author'])
-            ->withPostReactionCounts()
-            ->where(function ($query) use ($filter, $isDraft) {
+        $result = Post::withTrashed($isTrash)->with(['category', 'author'])
+            ->where(function (Builder $query) use ($filter, $isDraft, $isTrash, $categorySlug) {
                 if ($filter) {
-                    $query->where('title', 'like', "%{$filter}%");
-                    $query->orWhere('sub_title', 'like', "%{$filter}%");
+                    $query->where(function (Builder $subquery) use ($filter) {
+                        $subquery->where('title', 'like', "%{$filter}%")
+                                 ->orWhere('sub_title', 'like', "%{$filter}%");
+                    });
                 }
 
-                $query->where('is_draft', $isDraft);
+                if($isTrash){
+                   $query->whereNotNull("deleted_at");
+
+                }else {
+                    $query->where('is_draft', $isDraft);
+                }
+
+                if($categorySlug){
+                    $query->whereHas('category', function (Builder $query) use ($categorySlug){
+                        $query->where('slug', $categorySlug);
+                    });
+                }
             })
+            ->withPostReactionCounts()
             ->orderByDesc('created_at')
             ->paginate($perPage, ['*'], 'page', $page);
 
@@ -68,9 +83,10 @@ class PostRepository{
     public function getOne(string|int $param): Post
     {
         return Post::with(['author', 'category'])
-            ->withPostReactionCounts()
+            ->where('is_draft', false)
             ->where('slug', $param)
             ->orWhere('id', $param)
+            ->withPostReactionCounts()
             ->firstOrFail()
             ->load(['comments' => function ($query) {
                 $query

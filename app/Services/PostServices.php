@@ -10,18 +10,22 @@ class PostServices{
         protected PostRepository $postRepository
     ){}
 
-    public function paginateFeed(
+    public function paginate(
         int $page = 1,
         int $perPage = 15,
         string|null $search = null,
-        bool $isDraft = false
+        bool $isDraft = false,
+        bool $isTrash = false,
+        string|null $categorySlug = null,
     )
     {
-        return $this->postRepository->paginateFeed(
+        return $this->postRepository->paginate(
             page:$page,
             perPage: $perPage,
             filter: $search,
-            isDraft: $isDraft
+            isDraft: $isDraft,
+            isTrash: $isTrash,
+            categorySlug: $categorySlug
         );
     }
 

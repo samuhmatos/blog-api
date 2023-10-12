@@ -11,6 +11,8 @@ class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $PATH = "/api/register";
+
     public function test_new_users_can_register(): void
     {
         $user = [
@@ -20,7 +22,7 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ];
 
-        $response = $this->postJson('/api/register', $user);
+        $response = $this->postJson($this->PATH, $user);
 
         $response->assertCreated()->assertJsonFragment([
             'name'=> $user['name'],
@@ -41,12 +43,19 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ];
 
-        $response = $this->postJson('/api/register', $user);
+        $response = $this->postJson($this->PATH, $user);
 
         $this->assertAuthenticated();
         $response->assertCreated()->assertJsonFragment([
             'name'=> $user['name'],
             'email'=> $user['email'],
         ]);
+    }
+
+    public function test_it_should_return_422_when_not_providing_data():void
+    {
+        $response = $this->postJson($this->PATH, []);
+        $this->assertFalse($this->isAuthenticated());
+        $response->assertUnprocessable();
     }
 }

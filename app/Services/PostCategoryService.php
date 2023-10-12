@@ -12,9 +12,19 @@ class PostCategoryService{
         return $this->postCategoryRepository->getPopular();
     }
 
-    public function paginatePostsByCategory(string $categorySlug, int $page = 1, int $perPage = 15)
+    // public function paginatePostsByCategory(string $categorySlug, int $page = 1, int $perPage = 15)
+    // {
+    //     return $this->postCategoryRepository->paginatePostsByCategory(categorySlug: $categorySlug, page:$page, perPage: $perPage);
+    // }
+
+    public function paginate(
+        int $page = 1,
+        int $perPage = 15,
+        bool $isTrash = false,
+        string|null $categorySlug = null,
+    )
     {
-        return $this->postCategoryRepository->paginatePostsByCategory(categorySlug: $categorySlug, page:$page, perPage: $perPage);
+        return $this->postCategoryRepository->paginate($page, $perPage, $isTrash, $categorySlug);
     }
 }
 

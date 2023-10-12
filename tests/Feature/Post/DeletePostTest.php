@@ -3,11 +3,8 @@
 namespace Tests\Feature\Post;
 
 use App\Models\Post;
-use App\Models\PostCategory;
-use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class DeletePostTest extends TestCase

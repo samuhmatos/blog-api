@@ -13,14 +13,15 @@ class PostCategory extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'name',
+        'slug',
+        'description'
+    ];
+
     protected $hidden = [
         'deleted_at'
     ];
-
-    public function template():BelongsTo
-    {
-        return $this->belongsTo(Template::class);
-    }
 
     public function posts():HasMany
     {

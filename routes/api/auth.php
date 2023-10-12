@@ -38,5 +38,10 @@ Route::delete('/logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->middleware('auth:sanctum')
                 ->name('logout');
 
-Route::post('/user/{user}', [UpdateUserController::class, 'store'])->middleware('auth:sanctum');
-Route::delete('/user/{user}', [DeleteUserController::class, 'destroy'])->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')
+    ->prefix('/user')
+    ->group(function () {
+        Route::put('/{user}', [UpdateUserController::class, 'store']);
+        Route::delete('/{user}', [DeleteUserController::class, 'destroy']);
+    });

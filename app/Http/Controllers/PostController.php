@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Adapters\PaginationAdapter;
-use App\Enums\CategorySlug;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
-use App\Models\PostCategory;
 use App\Services\PostServices;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,19 +18,26 @@ class PostController extends Controller
     ){}
 
     private function paginate(
-        int $page,
-        int $perPage,
-        string|null $search,
+        Request $request,
         bool $isDraft,
+        bool $isTrash,
     )
     {
+        $page =  $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $search = $request->query('search');
+        $categorySlug = $request->query('category', null);
+
+
         return response(
             PaginationAdapter::toJson(
-                $this->postServices->paginateFeed(
+                $this->postServices->paginate(
                     page:$page,
                     perPage: $perPage,
                     search: $search,
-                    isDraft: $isDraft
+                    isDraft: $isDraft,
+                    isTrash: $isTrash,
+                    categorySlug: $categorySlug,
                 )
             )
         );
@@ -51,19 +55,6 @@ class PostController extends Controller
             $data = $this->postServices->getByCategory($query);
         }
 
-        // $args = [
-        //     'popular' => $this->postServices->getPopular(),
-        //     'best'=> $this->postServices->getLatestBest(),
-        //     'videos'=> $this->postServices->getByCategory(CategorySlug::videos),
-        //     'reviews'=> $this->postServices->getByCategory(CategorySlug::reviews),
-        //     'technology'=> $this->postServices->getByCategory(CategorySlug::tech)
-        // ];
-
-        // if(array_key_exists($query, $args))
-        //     return response($args[$query]);
-        // else
-        //     throw new NotFoundHttpException("Not Found category");
-
         if($data)
             return response($data);
         else
@@ -72,23 +63,21 @@ class PostController extends Controller
 
     public function paginateFeed(Request $request)
     {
-        $page =  $request->query('page', 1);
-        $perPage = $request->query('per_page', 10);
-        $search = $request->query('search');
-
-        return $this->paginate($page, $perPage, $search, false);
+        return $this->paginate($request, false, false);
     }
 
     public function paginateDrafts(Request $request)
     {
         $this->authorize('is_admin');
 
-        $page =  $request->query('page', 1);
-        $perPage = $request->query('per_page', 10);
-        $search = $request->query('search');
+        return $this->paginate($request, true, false);
+    }
 
-        return $this->paginate($page, $perPage, $search, true);
+    public function paginateTrash(Request $request)
+    {
+        $this->authorize('is_admin');
 
+        return $this->paginate($request, false, true);
     }
 
     public function suggestion()
@@ -159,7 +148,7 @@ class PostController extends Controller
     {
         $this->authorize('is_admin');
 
-        $payload = $request->only(['title', 'sub_title', 'content', 'category_id']);
+        $payload = $request->only(['title', 'sub_title', 'content', 'category_id', 'is_draft']);
         $banner = $request->file('banner');
 
         $payload['slug'] = str()->slug($payload['title']);
@@ -191,4 +180,13 @@ class PostController extends Controller
         return response()->noContent();
 
     }
+
+    public function restore(Request $request, int $post_id)
+    {
+        $post = Post::withTrashed()->findOrFail($post_id);
+        $post->restore();
+        return response($post);
+    }
 }
+
+//TODO: INBOX CHAT

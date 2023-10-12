@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Template;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -18,14 +17,12 @@ class PostCategoryFactory extends Factory
      */
     public function definition(): array
     {
-        $templates = Template::all();
         $name = fake()->unique()->text(50);
 
         return [
             'name'=> $name,
             'slug'=> Str::slug($name),
             'description'=> fake()->text(),
-            'template_id'=> $templates->random()->id
         ];
     }
 }

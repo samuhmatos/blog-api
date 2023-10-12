@@ -39,13 +39,14 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'username'=> $username,
             'email' => $request->email,
+            'image_url'=> null,
             'password' => Hash::make($request->password),
         ]);
 
-        Contact::create([
-            'name' => $request->name,
-            "email" => $request->email,
-        ]);
+        // Contact::create([
+        //     'name' => $request->name,
+        //     "email" => $request->email,
+        // ]);
 
         event(new Registered($user));
 
@@ -61,3 +62,4 @@ class RegisteredUserController extends Controller
         ,201);
     }
 }
+//TODO: VERIFICAR EVENTO REGISTERED

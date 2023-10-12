@@ -5,10 +5,8 @@ namespace Tests\Feature\PostReaction;
 use App\Enums\ReactionType;
 use App\Models\Post;
 use App\Models\PostCategory;
-use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class CreatePostReactionTest extends TestCase
@@ -19,7 +17,6 @@ class CreatePostReactionTest extends TestCase
     {
         User::factory()->create();
         $user = User::factory()->set('is_admin', true)->create();
-        Template::factory()->create();
         PostCategory::factory()->create();
         $post = Post::factory()->create();
 
@@ -36,7 +33,6 @@ class CreatePostReactionTest extends TestCase
     {
         User::factory()->create();
         $user = User::factory()->set('is_admin', true)->create();
-        Template::factory()->create();
         PostCategory::factory()->create();
         $post = Post::factory()->create();
 
@@ -49,7 +45,6 @@ class CreatePostReactionTest extends TestCase
     {
         User::factory()->create();
         $user = User::factory()->set('is_admin', true)->create();
-        Template::factory()->create();
         PostCategory::factory()->create();
         $post = Post::factory()->create();
 
@@ -66,7 +61,6 @@ class CreatePostReactionTest extends TestCase
     public function test_it_should_return_401_when_user_is_not_authenticated():void
     {
         $user = User::factory()->set('is_admin', true)->create();
-        Template::factory()->create();
         PostCategory::factory()->create();
         $post = Post::factory()->create();
 
@@ -79,7 +73,6 @@ class CreatePostReactionTest extends TestCase
     {
         User::factory()->create();
         $user = User::factory()->set('is_admin', true)->create();
-        Template::factory()->create();
         PostCategory::factory()->create();
         $post = Post::factory()->create();
 

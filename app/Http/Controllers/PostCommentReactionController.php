@@ -6,6 +6,7 @@ use App\Enums\ReactionType;
 use App\Models\PostComment;
 use App\Models\PostCommentReaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Enum;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,7 +25,17 @@ class PostCommentReactionController extends Controller
             ['type'=>$payload['type']]
         );
 
-        return response($reaction, 201);
+
+        $like = PostCommentReaction::withReactionCount($postComment->id, ReactionType::LIKE);
+        $unlike = PostCommentReaction::withReactionCount($postComment->id, ReactionType::UNLIKE);
+
+        return response([
+            'reaction' => $reaction,
+            'count' => [
+                'like' => $like,
+                'unlike' => $unlike
+            ]
+        ], 201);
     }
 
     public function destroy(PostComment $postComment): Response

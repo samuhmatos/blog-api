@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
@@ -15,8 +16,10 @@ Route::get('/test', function() {
     return "oi ".csrf_token();
 });
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     $user = $request->user();
-    return $user;
+    return response($user);
 });
 
+
+//todo: adicionar evento para quando tiver post novo para newsletter

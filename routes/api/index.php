@@ -4,4 +4,5 @@
     require_once('postComment.php');
     require_once('postCategory.php');
     require_once('contact.php');
+    require_once('newsletter.php');
 ?>

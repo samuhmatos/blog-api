@@ -1,8 +1,10 @@
 <?php
 
 use App\Models\Post;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +18,14 @@ use Illuminate\Support\Facades\Storage;
 */
 
 Route::get('/', function () {
-    return ['Laravel' => app()->version()];
+    $token = Hash::make(Str::random(60));
+
+    dd(auth());
+    return [
+        'Laravel' => app()->version(),
+        'token' => $token,
+        strlen($token)
+    ];
 });
 
 // Route::get('/storage/uploads/posts/banners/{filename}', function ($filename) {

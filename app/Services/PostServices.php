@@ -34,9 +34,12 @@ class PostServices{
         return $this->postRepository->getMostViewed($limit);
     }
 
-    public function getLatestBest(): Collection
+    public function getLatestBest(
+        int $limit = 3,
+        bool $filterWeek = false
+    ): Collection
     {
-        return $this->postRepository->getLatestBest();
+        return $this->postRepository->getLatestBest($limit, $filterWeek);
     }
 
     public function getOne(string|int $param): Post

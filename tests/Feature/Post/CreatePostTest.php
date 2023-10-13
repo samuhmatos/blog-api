@@ -15,7 +15,6 @@ class CreatePostTest extends TestCase
     use RefreshDatabase;
     public function test_it_should_create_a_post(): void
     {
-        $this->seed();
         $user = User::factory()->set('is_admin', true)->create();
 
         $category = PostCategory::factory()->create();
@@ -29,7 +28,7 @@ class CreatePostTest extends TestCase
             'sub_title'=> "This is the sub title's post",
             'content' => "This is the content of the post",
             'banner'=> $file,
-            'is_draft' => rand(1,2) == 2 ? true : false,
+            'is_draft' => false,
             'category_id'=> $category->id
         ];
 

@@ -1,7 +1,14 @@
 <?php
 
+use App\Events\WeeklyNewsLetter;
+use App\Jobs\NotifyNewsLetter;
+use App\Mail\PostPostedMail;
 use App\Models\Post;
+use App\Repositories\PostRepository;
+use App\Services\PostServices;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -28,15 +35,26 @@ Route::get('/', function () {
     ];
 });
 
-// Route::get('/storage/uploads/posts/banners/{filename}', function ($filename) {
-//     $path = storage_path("app/public/uploads/posts/banners/{$filename}");
+Route::get('/send-mail', function(){
+    // Mail::raw('Usuário criado com sucesso!', function ($message){
+    //     $message->to('test@gmail.com')
+    //         ->subject('noreplay');
+    // });
 
-//     if (!Storage::exists("public/uploads/posts/banners/{$filename}")) {
-//         abort(404);
-//     }
+    // foreach (["teste@gmail", "samuh@gmail.com"] as $value) {
+    //     // Mail::send(new PostPublished($value));
+    //      NotifyNewsLetter::dispatch($value);
+    // }
 
-//     $file = Storage::get("public/uploads/posts/banners/{$filename}");
-//     $type = Storage::mimeType("public/uploads/posts/banners/{$filename}");
+    // event(new WeeklyNewsLetter());
 
-//     return response()->make($file, 200, ['Content-Type' => $type]);
-// });
+    $postService = new PostServices(new PostRepository(new Post));
+
+    return view('emails.post-posted',[
+        'posts' => $postService->getLatestBest(6, true),
+        'newsletter' => [
+            'email' => "samuh@gmail.com",
+            "token" => "ajknsfdiousandgojnafdçljoijdsafjnuadn"
+        ]
+    ]);
+});

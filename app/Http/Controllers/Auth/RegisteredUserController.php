@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\Contact;
+use App\Models\Newsletter;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -43,10 +44,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Contact::create([
-        //     'name' => $request->name,
-        //     "email" => $request->email,
-        // ]);
+        Newsletter::create([
+            'email' => $request->email,
+        ]);
 
         event(new Registered($user));
 
@@ -63,3 +63,4 @@ class RegisteredUserController extends Controller
     }
 }
 //TODO: VERIFICAR EVENTO REGISTERED
+//todo: esqueceu a senha, verificar senha, nova senha

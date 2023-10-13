@@ -98,8 +98,8 @@ class PostController extends Controller
 
     public function store(PostRequest $request)
     {
-        $request->validate(['title'=> 'unique:posts']);
         $this->authorize('is_admin');
+        $request->validate(['title'=> 'unique:posts']);
 
         $payload = $request->only(['title', 'sub_title', 'content', 'category_id', 'is_draft']);
         $banner = $request->file('banner');
@@ -113,6 +113,7 @@ class PostController extends Controller
         $payload['author_id'] = auth()->user()->id;
 
         $post = Post::create($payload);
+
 
         return response($post, 201);
     }
@@ -161,11 +162,9 @@ class PostController extends Controller
             $payload['image_url'] = $image_url;
         }
 
-
         $post->update($payload);
 
         return response($post);
-
     }
 
     /**
@@ -178,7 +177,6 @@ class PostController extends Controller
         $post->delete();
 
         return response()->noContent();
-
     }
 
     public function restore(Request $request, int $post_id)

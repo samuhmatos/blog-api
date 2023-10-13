@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Post;
 use App\Repositories\Contracts\PaginationInterface;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -59,13 +60,19 @@ class PostRepository{
             ->get();
     }
 
-    public function getLatestBest(): Collection
+    public function getLatestBest(int $limit, bool $filterWeek = false): Collection
     {
         return Post::with(['category', 'author'])
             ->withPostReactionCounts()
+            ->where(function (Builder $query) use ($filterWeek){
+                $startDate = Carbon::now()->startOfWeek();
+                $endDate = Carbon::now()->endOfWeek();
+
+                $query->whereBetween('created_at', [$startDate, $endDate]);
+            })
             ->orderByDesc('like_count')
             ->orderBy('views', 'desc')
-            ->limit(3)
+            ->limit($limit)
             ->get();
     }
 

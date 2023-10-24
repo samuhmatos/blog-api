@@ -38,6 +38,16 @@ class PostCommentReactionController extends Controller
         ], 201);
     }
 
+    public function show(Request $request, PostComment $postComment)
+    {
+        $reaction = PostCommentReaction::query()
+            ->where('comment_id', $postComment->id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        return response($reaction);
+    }
+
     public function destroy(PostComment $postComment): Response
     {
         $user_id = auth()->user()->id;

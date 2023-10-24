@@ -46,9 +46,6 @@ class LoginRequest extends FormRequest
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
-            //throw new BadRequestHttpException("Email ou senha incorretos!");
-
-
             throw ValidationException::withMessages([
                 'email' => __('Email ou senha incorretos!'),
             ]);

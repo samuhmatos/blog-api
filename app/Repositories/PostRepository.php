@@ -65,10 +65,13 @@ class PostRepository{
         return Post::with(['category', 'author'])
             ->withPostReactionCounts()
             ->where(function (Builder $query) use ($filterWeek){
-                $startDate = Carbon::now()->startOfWeek();
-                $endDate = Carbon::now()->endOfWeek();
 
-                $query->whereBetween('created_at', [$startDate, $endDate]);
+                if($filterWeek){
+                    $startDate = Carbon::now()->startOfWeek();
+                    $endDate = Carbon::now()->endOfWeek();
+                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                }
+
             })
             ->orderByDesc('like_count')
             ->orderBy('views', 'desc')

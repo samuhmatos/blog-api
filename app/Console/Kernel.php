@@ -19,7 +19,8 @@ class Kernel extends ConsoleKernel
     {
         //$schedule->command('inspire')->everyMinute();
 
-        $schedule->command('newsletter:notify')->everyTwentySeconds();
+        $schedule->command('newsletter:notify')->fridays();
+        $schedule->command('auth:clear-resets')->daily();
     }
 
     /**

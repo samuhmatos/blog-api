@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Casts\ImageUrlCast;
-use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -73,5 +72,4 @@ class Post extends Model
                     ->groupBy('post_id');
             }, 'unlike_count');
     }
-
 }

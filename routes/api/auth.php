@@ -37,11 +37,3 @@ Route::post('/email/verification-notification', [EmailVerificationNotificationCo
 Route::delete('/logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->middleware('auth:sanctum')
                 ->name('logout');
-
-
-Route::middleware('auth:sanctum')
-    ->prefix('/user')
-    ->group(function () {
-        Route::put('/{user}', [UpdateUserController::class, 'store']);
-        Route::delete('/{user}', [DeleteUserController::class, 'destroy']);
-    });

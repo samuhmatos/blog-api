@@ -7,6 +7,8 @@ use App\Models\Post;
 use App\Repositories\PostRepository;
 use App\Services\PostServices;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -24,37 +26,10 @@ use Illuminate\Support\Str;
 |
 */
 
-Route::get('/', function () {
-    $token = Hash::make(Str::random(60));
-
-    dd(auth());
+Route::get('/', function (Request $request) {
     return [
         'Laravel' => app()->version(),
-        'token' => $token,
-        strlen($token)
+        'sessions' => Auth::user()
     ];
 });
 
-Route::get('/send-mail', function(){
-    // Mail::raw('Usuário criado com sucesso!', function ($message){
-    //     $message->to('test@gmail.com')
-    //         ->subject('noreplay');
-    // });
-
-    // foreach (["teste@gmail", "samuh@gmail.com"] as $value) {
-    //     // Mail::send(new PostPublished($value));
-    //      NotifyNewsLetter::dispatch($value);
-    // }
-
-    // event(new WeeklyNewsLetter());
-
-    $postService = new PostServices(new PostRepository(new Post));
-
-    return view('emails.post-posted',[
-        'posts' => $postService->getLatestBest(6, true),
-        'newsletter' => [
-            'email' => "samuh@gmail.com",
-            "token" => "ajknsfdiousandgojnafdçljoijdsafjnuadn"
-        ]
-    ]);
-});

@@ -8,14 +8,9 @@ class PostCategoryService{
     public function __construct(protected PostCategoryRepository $postCategoryRepository)
     {}
 
-    public function getPopular(){
-        return $this->postCategoryRepository->getPopular();
+    public function getPopular(int $limit = 5){
+        return $this->postCategoryRepository->getPopular($limit);
     }
-
-    // public function paginatePostsByCategory(string $categorySlug, int $page = 1, int $perPage = 15)
-    // {
-    //     return $this->postCategoryRepository->paginatePostsByCategory(categorySlug: $categorySlug, page:$page, perPage: $perPage);
-    // }
 
     public function paginate(
         int $page = 1,

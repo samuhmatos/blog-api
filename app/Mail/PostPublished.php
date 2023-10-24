@@ -43,7 +43,7 @@ class PostPublished extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.post-posted',
+            view: 'emails.newsletter',
         );
     }
 

@@ -20,12 +20,14 @@ class UpdateUserController extends Controller
             'name' => ['string', "max:100"],
             'username' => ['string', "max:255", "unique:users,username"],
             "image" => ['image', "max:5000"],
-            "email"=> ["email", "unique:users,id"],
+            "email"=> ["email", "unique:users,email"],
+            "description" => ["string", "max:255"],
             "password" => ['confirmed', Rules\Password::defaults()]
         ]);
 
-        $payload = $request->only(['name', 'username', 'email']);
+        $payload = $request->only(['name', 'username', 'email', 'description']);
         $image = $request->file('image');
+
 
         if($image){
             if($user->image_url) {
@@ -35,20 +37,16 @@ class UpdateUserController extends Controller
             $payload['image_url'] = $image->store('/uploads/users');
         }
 
-       // $contact = Contact::query()->where("email", $user->email)->first();
-
         $user->update($payload);
         $user->fresh();
 
-        // $contact->update([
-        //     'name' => $user->name,
-        //     "email" => $user->email,
-        // ]);
-
-        if($request->email && $request->email != $user->email){
-            $user->tokens()->delete();
-            $token = $user->createToken('user_auth')->plainTextToken;
+        if(auth()->user()->id == $user->id){
+            if($request->email && $request->email != $user->email){
+                $user->tokens()->delete();
+                $token = $user->createToken('user_auth')->plainTextToken;
+            }
         }
+
 
         return response([
             'user' => $user,

@@ -12,7 +12,16 @@ class PostCategoryController extends Controller
 {
     public function __construct(protected PostCategoryService $postCategoryService)
     {}
-    public function index(Request $request)
+
+    public function index(Request $request){
+        // $this->authorize('is_admin');
+
+        $categories = PostCategory::all();
+
+        return response($categories);
+    }
+
+    public function paginate(Request $request)
     {
         $page =  $request->query('page', 1);
         $perPage = $request->query('per_page', 10);
@@ -28,19 +37,8 @@ class PostCategoryController extends Controller
         )));
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function paginatePosts(Request $request, string $slug)
-    // {
-    //     $page =  $request->query('page', 1);
-    //     $perPage = $request->query('per_page', 10);
-
-    //     return response(PaginationAdapter::toJson($this->postCategoryService->paginatePostsByCategory($slug, $page, $perPage)));
-    // }
-
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $this->authorize('is_admin');
 
         $request->validate([
@@ -68,14 +66,16 @@ class PostCategoryController extends Controller
 
     }
 
-    public function show(PostCategory $postCategory)
+    public function show(string|int $param)
     {
+        $postCategory = PostCategory::query()->where('id', $param)->orWhere('slug', $param)->firstOrFail();
         return response($postCategory);
     }
 
-    public function getPopular()
+    public function getPopular(Request $request)
     {
-        $categories = $this->postCategoryService->getPopular();
+        $limit = $request->query('limit', 5);
+        $categories = $this->postCategoryService->getPopular($limit);
         return response($categories);
     }
 

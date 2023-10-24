@@ -15,21 +15,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): Response
     {
-        // if(Auth::attempt($request->only('email', 'password'))){
-        //     return response([
-        //         "Authorized"=> true,
-        //         'token' => $request->user()->createToken('invoice')->plainTextToken
-        //     ], 200);
-        // }
-        // // 3|TgsMDX4jGhLamrYiXrciwXw2mutyP4mYVYz6At5T
-
-        // return response("nao autorizado", 403);
-
-
         $request->authenticate();
 
         $token = $request->user()->createToken('user:login');
-        //$request->session()->regenerate();
+        // $request->session()->regenerate();
 
         return response(
             [

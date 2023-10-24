@@ -807,7 +807,9 @@
           </tr>
           <tr>
             <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-              <div style="font-family:Nunito, Helvetica, Arial, sans-serif;font-size:14px;font-weight:400;line-height:18px;text-align:center;color:#54595f;">Caso você não queira mais fazer parte da newsletter, você pode <a href="{{env('FRONTEND_URL')}}/newsletter/unsubscribe/{{$newsletter['email']}}?token={{$newsletter['token']}}" style="color: #54595f; text-decoration: underline;">desisncrever</a> da lista e não receberá os futuros emails mais.</div>
+                <div style="font-family:Nunito, Helvetica, Arial, sans-serif;font-size:14px;font-weight:400;line-height:18px;text-align:center;color:#54595f;">
+                    Caso você não queira mais fazer parte da newsletter, você pode <a href="{{env('FRONTEND_URL')}}/newsletter/unsubscribe?token={{$newsletter['token']}}&&email={{$newsletter['email']}}" style="color: #54595f; text-decoration: underline;">desisncrever</a> da lista e não receberá os futuros emails mais.
+                </div>
             </td>
           </tr>
         </tbody></table>

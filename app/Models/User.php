@@ -29,6 +29,8 @@ class User extends Authenticatable
         'image_url',
         'email',
         'password',
+        'is_admin',
+        'description'
     ];
 
     /**
@@ -59,9 +61,12 @@ class User extends Authenticatable
         return $this->hasMany(Post::class);
     }
 
-    public function NewsLetter(): HasOne
+    public function newsletter(): HasOne
     {
-        return $this->hasOne(NewsLetter::class);
+        return $this->hasOne(NewsLetter::class, 'email', 'email');
     }
 
 }
+
+
+// TODO: VALIDAR QUANDO USAUROI APAGA A CONTA E DEPOIS QUER RESTAURA-LA

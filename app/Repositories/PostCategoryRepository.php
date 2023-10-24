@@ -49,8 +49,11 @@ class PostCategoryRepository
 
         return new PaginationPresenter($result);
     }
-    public function getPopular(){
-        return PostCategory::postsCount()->orderByDesc('posts_count')->get();
+    public function getPopular(int $limit){
+        return PostCategory::postsCount()
+            ->orderByDesc('posts_count')
+            ->limit($limit)
+            ->get();
     }
 }
 

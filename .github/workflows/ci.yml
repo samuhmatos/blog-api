@@ -9,7 +9,7 @@ jobs:
     runs-on: ubunto-latest
     steps:
       - name: Checkout do repositorio
-        uses: actions/checkout@1
+        uses: actions/checkout@v1
       - name: Deploy para o meu hosting
         uses: easingthemes/ssh-deploy@main
         env:

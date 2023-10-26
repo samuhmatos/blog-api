@@ -41,6 +41,3 @@ Route::middleware(['auth:sanctum'])->prefix('/post')->group(function (){
 
     Route::post('/{post}/comment/{postComment}/report', [PostCommentReportController::class, 'store']);
 });
-
-
-// TODO: REPORT POST COMMENT

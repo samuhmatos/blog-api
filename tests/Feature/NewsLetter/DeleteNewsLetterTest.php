@@ -16,10 +16,10 @@ class DeleteNewsLetterTest extends TestCase
     protected function path(string $email, string|null $token = null):string
     {
         if($token){
-            return "/api/newsletter/unsubscribe/{$email}?token={$token}";
+            return "/api/newsletter/{$email}?token={$token}";
         }
 
-        return "/api/newsletter/unsubscribe/{$email}";
+        return "/api/newsletter/{$email}";
     }
 
     public function test_it_should_unsubscribe_from_newsletter(): void

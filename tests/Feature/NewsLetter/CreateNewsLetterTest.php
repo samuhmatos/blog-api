@@ -11,7 +11,7 @@ class CreateNewsLetterTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    protected $path = "/api/newsletter/subscribe";
+    protected $path = "/api/newsletter";
 
     public function test_it_should_subscribe_a_new_registry_newsletter(): void
     {
@@ -19,7 +19,9 @@ class CreateNewsLetterTest extends TestCase
             'email' => $this->faker->email()
         ]);
 
-        $response->assertCreated();
+        $response->dump();
+
+        $response->assertNoContent();
     }
 
     public function test_it_should_return_422_when_email_already_exists():void

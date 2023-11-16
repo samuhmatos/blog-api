@@ -43,4 +43,11 @@ class Repository implements IRepository {
     {
         return $this->model()::all();
     }
+
+    public function updateOrCreate(array $atributes, array $values): Model|null
+    {
+        return $this->model()
+            ->query()
+            ->updateOrCreate($atributes, $values);
+    }
 }

@@ -52,7 +52,7 @@ class PostCommentController extends Controller
         }
     }
 
-    public function destroy(Request $request, PostComment $postComment)
+    public function destroy(PostComment $postComment)
     {
         $this->authorize('owner', [$postComment]);
 

@@ -15,6 +15,8 @@ interface IRepository {
     public function delete(int $id):int;
 
     public function create(array $parameters):Model|null;
+
+    public function updateOrCreate(array $atributes, array $values):Model|null;
 }
 
 ?>

@@ -19,12 +19,12 @@ class PostCommentReactionFactory extends Factory
      */
     public function definition(): array
     {
-        $users = User::query()->where('is_admin',0)->get();
-        $commentID = PostComment::all();
+        // $users = User::query()->where('is_admin',0)->get();
+        // $commentID = PostComment::all();
 
         return [
-            'user_id'=> $users->random()->id,
-            'comment_id'=> $commentID->random()->id,
+            // 'user_id'=> $users->random()->id,
+            // 'comment_id'=> $commentID->random()->id,
             'type'=> rand(0,1) == 1 ? 'LIKE' : "UNLIKE"
         ];
     }

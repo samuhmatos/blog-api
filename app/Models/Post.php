@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Post extends Model
 {
@@ -71,5 +72,15 @@ class Post extends Model
                     ->where('type', 'UNLIKE')
                     ->groupBy('post_id');
             }, 'unlike_count');
+    }
+
+    public function scopeWithUserReaction(Builder $query)
+    {
+        return $query->selectSub(function ($query){
+            $query->from('post_reactions')
+                ->select('type')
+                ->whereColumn('post_id', 'posts.id')
+                ->where('user_id', Auth::check() ? Auth::id() : null);
+        }, 'user_reaction');
     }
 }

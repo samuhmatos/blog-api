@@ -20,10 +20,11 @@ class CreatePostCommentTest extends TestCase
         $post = Post::first();
 
         $payload = [
-            'comment' => $this->faker()->realText(500)
+            'comment' => $this->faker()->realText(),
+            'post_id' => $post->id,
         ];
 
-        $response = $this->actingAs($user)->postJson("/api/post/{$post->id}/comment", $payload);
+        $response = $this->actingAs($user)->postJson("/api/comment", $payload);
 
         $response->assertCreated();
     }
@@ -37,38 +38,39 @@ class CreatePostCommentTest extends TestCase
 
         $payload = [
             'parent_id' => $postComment->id,
-            'comment' => $this->faker()->realText(500)
+            'post_id' => $post->id,
+            'comment' => $this->faker()->realText(),
         ];
 
-        $response = $this->actingAs($user)->postJson("/api/post/{$post->id}/comment", $payload);
+        $response = $this->actingAs($user)->postJson("/api/comment", $payload);
 
         $response->assertCreated();
-    }
-
-    public function test_it_should_return_404_when_post_is_not_found()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->postJson("/api/post/50000/comment", [
-            'comment' => $this->faker->realText(500)
-        ]);
-
-        $response->assertNotFound();
     }
 
     public function test_it_should_return_401_when_user_is_not_authenticated(): void
     {
         $this->seed();
+
+
+        $response = $this->postJson("/api/comment");
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_it_should_return_422_when_provided_data_is_not_valid():void
+    {
+        $this->seed();
+        $user = User::first();
         $post = Post::first();
         $postComment = PostComment::factory()->set('post_id', $post->id)->create();
 
         $payload = [
             'parent_id' => $postComment->id,
-            'comment' => $this->faker()->realText(500)
+            'post_id' => $post->id,
         ];
 
-        $response = $this->postJson("/api/post/{$post->id}/comment", $payload);
+        $response = $this->actingAs($user)->postJson("/api/comment", $payload);
 
-        $response->assertUnauthorized();
+        $response->assertUnprocessable();
     }
 }

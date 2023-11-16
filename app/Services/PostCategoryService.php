@@ -16,10 +16,10 @@ class PostCategoryService{
         int $page = 1,
         int $perPage = 15,
         bool $isTrash = false,
-        string|null $categorySlug = null,
+        string|null $search = null,
     )
     {
-        return $this->postCategoryRepository->paginate($page, $perPage, $isTrash, $categorySlug);
+        return $this->postCategoryRepository->paginate($page, $perPage, $isTrash, $search);
     }
 }
 

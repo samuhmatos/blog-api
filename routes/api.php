@@ -11,10 +11,9 @@ Route::get('/', function (){
 
 require __DIR__.'/api/index.php';
 
-Route::get('/test', function() {
-    dd(csrf_token());
-    return "oi ".csrf_token();
-});
+Route::get('/test', function(Request $request) {
+    return [Auth::user(), Auth::check(), Auth::id(), Auth::user()->id];
+})->middleware('guard');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     $user = $request->user();
@@ -22,4 +21,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-//todo: adicionar evento para quando tiver post novo para newsletter

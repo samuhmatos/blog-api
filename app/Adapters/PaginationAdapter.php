@@ -2,7 +2,6 @@
 
 namespace App\Adapters;
 
-use App\Http\Resources\DefaultResource;
 use App\Repositories\Contracts\PaginationInterface;
 
 class PaginationAdapter{

@@ -29,14 +29,15 @@ class PostCategoryRepository
         int $page,
         int $perPage,
         bool $isTrash,
-        string|null $categorySlug,
+        string|null $search,
     ): PaginationInterface
     {
         $result = PostCategory::withTrashed($isTrash)
             ->postsCount()
-            ->where(function (Builder $query) use ($categorySlug, $isTrash){
-                if($categorySlug){
-                    $query->where('category_slug', $categorySlug);
+            ->where(function (Builder $query) use ($search, $isTrash){
+                if($search){
+                    $query->where('slug', $search);
+                    $query->where('name', $search);
                 }
 
                 if($isTrash){

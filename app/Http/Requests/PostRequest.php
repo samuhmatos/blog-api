@@ -36,7 +36,8 @@ class PostRequest extends FormRequest
                 'max:500000'
             ],
             'category_id'=> ['required','integer', 'exists:post_categories,id'],
-            'is_draft'=>['required','boolean']
+            'is_draft'=>['required','boolean'],
+            'img_content_list' => ['required']
         ];
     }
 }

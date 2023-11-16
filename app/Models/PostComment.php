@@ -67,4 +67,15 @@ class PostComment extends Model
                     ->groupBy('comment_id');
             }, 'unlike_count');
     }
+
+    public function scopeWithUserReaction(Builder $query)
+    {
+        return $query->selectSub(function($query){
+            $query
+                ->from('post_comment_reactions')
+                ->select('type')
+                ->whereColumn('comment_id', 'post_comments.id')
+                ->where('user_id', auth()->check() ? auth()->id() : null);
+        }, 'user_reaction');
+    }
 }

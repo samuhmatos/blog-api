@@ -97,6 +97,7 @@ class PostRepository{
             ->where('slug', $param)
             ->orWhere('id', $param)
             ->withPostReactionCounts()
+            ->withUserReaction()
             ->firstOrFail()
             ->load(['comments' => function ($query) {
                 $query
@@ -104,11 +105,13 @@ class PostRepository{
                     ->with('user')
                     ->orderByDesc('updated_at')
                     ->orderByDesc('id')
-                    ->withReactionCounts();
+                    ->withReactionCounts()
+                    ->withUserReaction();
             }, 'comments.answers' => function ($query) {
                 $query
                     ->with('user')
-                    ->withReactionCounts();
+                    ->withReactionCounts()
+                    ->withUserReaction();
             }]);
     }
 

@@ -26,14 +26,14 @@ class PostCategoryController extends Controller
         $page =  $request->query('page', 1);
         $perPage = $request->query('per_page', 10);
         $is_trash = $request->query('is_trash', false);
-        $categorySlug = $request->query('category', null);
+        $search = $request->query('search', null);
 
 
         return response(PaginationAdapter::toJson($this->postCategoryService->paginate(
             page: $page,
             perPage: $perPage,
             isTrash: $is_trash,
-            categorySlug: $categorySlug
+            search: $search
         )));
     }
 

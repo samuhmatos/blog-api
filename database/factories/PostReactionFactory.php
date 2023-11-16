@@ -19,12 +19,12 @@ class PostReactionFactory extends Factory
      */
     public function definition(): array
     {
-        $users = User::query()->where('is_admin',1)->get();
-        $posts = Post::all();
+        // $users = User::query()->where('is_admin',1)->get();
+        // $posts = Post::all();
 
         return [
-            'user_id'=> $users->random()->id,
-            'post_id'=> $posts->random()->id,
+            // 'user_id'=> $users->random()->id,
+            // 'post_id'=> $posts->random()->id,
             'type'=> rand(0,1) == 1 ? ReactionType::LIKE : ReactionType::UNLIKE
         ];
     }

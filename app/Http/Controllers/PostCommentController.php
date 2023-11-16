@@ -2,58 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
+use App\DTOs\PostComments\CreatePostCommentDTO;
+use App\DTOs\PostComments\DestroyPostCommentDTO;
+use App\DTOs\PostComments\UpdatePostCommentDTO;
+use App\Http\Requests\PostComment\CreatePostCommentRequest;
+use App\Http\Requests\PostComment\UpdatePostCommentRequest;
 use App\Models\PostComment;
+use App\Services\PostCommentService;
 use Illuminate\Http\Request;
 
 class PostCommentController extends Controller
 {
-    public function index(Post $post)
+    public function __construct(
+        protected PostCommentService $service
+    ){}
+
+    public function store(CreatePostCommentRequest $request)
     {
-        $postComments = PostComment::with(['user', 'answers.user'])->where('post_id', $post->id)->where('parent_id', null)->get();
+        try {
+            $createdComment = $this->service->store(
+                new CreatePostCommentDTO(
+                    user_id: auth()->id(),
+                    post_id: $request->validated('post_id'),
+                    comment: $request->validated('comment'),
+                    parent_id: $request->validated('parent_id'),
+                )
+            );
 
-        return response($postComments);
-    }
-    public function store(Request $request, Post $post)
-    {
-        $request->validate([
-            'parent_id' => ['integer', "exists:post_comments,id"],
-            'comment' => ['required', 'string', 'max:500']
-        ]);
+            return response()
+                ->json($createdComment, 201);
 
-        $payload = $request->only(['parent_id', 'comment']);
-        $payload['user_id'] = auth()->user()->id;
-        $payload['post_id'] = $post->id;
-
-        $postComment = PostComment::query()->create($payload);
-        $postComment = $postComment->refresh()->load(['user', 'parent']);
-        return response($postComment, 201);
-    }
-
-    public function update(Request $request, Post $post, PostComment $postComment)
-    {
-        $request->validate([
-            'comment'=> ['required', 'string', 'max:500']
-        ]);
-
-        $this->authorize('matchUser', $postComment);
-        $this->authorize('matchPost', [$postComment, $post]);
-
-        $postComment->comment = $request->input('comment');
-        $postComment->save();
-        $postComment->load('user');
-
-        return response($postComment, 201);
+        }catch(\Exception $e) {
+            return response()
+                ->json(['message' => $e->getMessage()], 500);
+        }
     }
 
-    public function destroy(Request $request, Post $post, PostComment $postComment)
+    public function update(UpdatePostCommentRequest $request, PostComment $postComment)
     {
-        $this->authorize('matchUser', $postComment);
-        $this->authorize('matchPost', [$postComment, $post]);
+        try{
+            $comment = $this->service->update(
+                new UpdatePostCommentDTO($postComment->id, $request->comment)
+            );
 
-        $postComment->delete();
+            return response()->json($comment);
+        }catch(\Exception $e) {
+            return response()
+                ->json(['message' => $e->getMessage()], 500);
+        }
+    }
 
-        return response()->noContent();
+    public function destroy(Request $request, PostComment $postComment)
+    {
+        $this->authorize('owner', [$postComment]);
+
+        try{
+            $this->service->destroy(new DestroyPostCommentDTO($postComment->id));
+
+            return response()->noContent();
+
+        }catch(\Exception $e) {
+            return response()
+                ->json(['message' => $e->getMessage()], 500);
+        }
     }
 
 

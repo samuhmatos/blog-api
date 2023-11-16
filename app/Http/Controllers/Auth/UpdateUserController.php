@@ -22,10 +22,15 @@ class UpdateUserController extends Controller
             "image" => ['image', "max:5000"],
             "email"=> ["email", "unique:users,email"],
             "description" => ["string", "max:255"],
-            "password" => ['confirmed', Rules\Password::defaults()]
+            "password" => ['confirmed', Rules\Password::defaults()],
+            "is_admin" => [
+                "boolean",
+                Rule::requiredIf($request->user()->is_admin),
+                Rule::excludeIf(!$request->user()->is_admin)
+            ]
         ]);
 
-        $payload = $request->only(['name', 'username', 'email', 'description']);
+        $payload = $request->only(['name', 'username', 'email', 'description', 'is_admin']);
         $image = $request->file('image');
 
 

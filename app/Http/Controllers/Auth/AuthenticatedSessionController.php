@@ -33,11 +33,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): Response
     {
+        $request->user()->currentAccessToken()->delete();
         Auth::guard('web')->logout();
-
-        // $request->session()->invalidate();
-
-        // $request->session()->regenerateToken();
 
         return response()->noContent();
     }

@@ -8,8 +8,10 @@ use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Services\PostServices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 class PostController extends Controller
 {
@@ -103,15 +105,30 @@ class PostController extends Controller
         $request->validate(['title'=> 'unique:posts']);
 
         $payload = $request->only(['title', 'sub_title', 'content', 'category_id', 'is_draft']);
+        $imageContentList = $request->only('img_content_list');
         $banner = $request->file('banner');
 
+
+
         if($banner){
-            $image_url = $banner->store('/uploads/posts/banners');
+            $lastPostId = Post::latest()->first()->id + 1;
+
+            $image_url = $banner->store("/uploads/posts/{$lastPostId}/banners");
             $payload['image_url'] = $image_url;
         }
 
         $payload['slug'] = str()->slug($payload['title']);
         $payload['author_id'] = auth()->user()->id;
+
+        if(!is_array($imageContentList)){
+            throw new UnsupportedMediaTypeHttpException('O campo img_content_list precisa ser uma array');
+        }
+
+
+        foreach ($imageContentList as $key => $value) {
+            $path = Storage::urlToPath($payload);
+            return $path;
+        }
 
         $post = Post::create($payload);
 
@@ -159,7 +176,7 @@ class PostController extends Controller
         if($banner){
             Storage::delete($post->image_url);
 
-            $image_url = $banner->store('/uploads/posts/banners/');
+            $image_url = $banner->store("/uploads/posts/{$post->id}/banners/");
             $payload['image_url'] = $image_url;
         }
 

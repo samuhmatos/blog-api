@@ -18,13 +18,12 @@ class PostCommentPolicy
         //
     }
 
-    public function matchPost(User $user, PostComment $postComment, Post $post)
+    public function owner(User $user, PostComment $postComment)
     {
-        return $post->id === $postComment->post_id;
-    }
+        if($user->id === $postComment->user_id){
+            return true;
+        }
 
-    public function matchUser(User $user, PostComment $postComment)
-    {
-        return $user->id === $postComment->user_id;
+        return false;
     }
 }

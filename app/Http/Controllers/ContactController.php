@@ -2,25 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contact;
+use App\DTOs\ContactDTO;
+use App\Http\Requests\ContactRequest;
+use App\Services\ContactService;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    public function store(Request $request)
+    public function __construct(
+        protected ContactService $service
+    ){}
+    public function store(ContactRequest $request)
     {
-        $request->validate([
-            'email' => ['required', 'email', 'max:255'],
-            'name' => ['required', 'string', 'max:100'],
-            'phone' => ['string', 'max:20'],
-            'subject' => ['required', 'string', 'max:100'],
-            'message' => ['required', 'string', 'max:255'],
-        ]);
+        try{
+            $this->service->store(new ContactDTO(
+                email: $request->validated('email'),
+                name: $request->validated('name'),
+                phone: $request->validated('phone'),
+                subject: $request->validated('subject'),
+                message: $request->validated('message'),
+            ));
 
-        $payload = $request->only('email', 'name', 'phone', 'subject', 'message');
-
-        Contact::create($payload);
-
-        return response()->noContent();
+            return response()->noContent();
+        }catch(\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 }

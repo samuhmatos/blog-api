@@ -2,61 +2,46 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\PostCommentReaction\CreatePostCommentReactionDTO;
 use App\Enums\ReactionType;
 use App\Models\PostComment;
-use App\Models\PostCommentReaction;
+use App\Services\PostCommentReactionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Enum;
 use Symfony\Component\HttpFoundation\Response;
 
 class PostCommentReactionController extends Controller
 {
+    public function __construct(
+        protected PostCommentReactionService $service
+    ){}
     public function store(Request $request, PostComment $postComment): Response
     {
         $request->validate([
             'type' => ['required', 'string', new Enum(ReactionType::class)]
         ]);
 
-        $payload = $request->only(['type']);
+        $type = $request->type == ReactionType::LIKE
+            ? ReactionType::LIKE
+            : ReactionType::UNLIKE;
 
-        $reaction = PostCommentReaction::query()->updateOrCreate(
-            ['comment_id'=> $postComment->id, 'user_id'=> auth()->user()->id],
-            ['type'=>$payload['type']]
+        $commentCreated = $this->service->store(
+            new CreatePostCommentReactionDTO($postComment->id, $type)
         );
 
-
-        $like = PostCommentReaction::withReactionCount($postComment->id, ReactionType::LIKE);
-        $unlike = PostCommentReaction::withReactionCount($postComment->id, ReactionType::UNLIKE);
-
-        return response([
-            'reaction' => $reaction,
-            'count' => [
-                'like' => $like,
-                'unlike' => $unlike
-            ]
-        ], 201);
+        return response($commentCreated, 201);
     }
 
-    public function show(Request $request, PostComment $postComment)
+    public function show(PostComment $postComment): Response
     {
-        $reaction = PostCommentReaction::query()
-            ->where('comment_id', $postComment->id)
-            ->where('user_id', $request->user()->id)
-            ->firstOrFail();
+        $reaction = $this->service->show($postComment->id);
 
         return response($reaction);
     }
 
     public function destroy(PostComment $postComment): Response
     {
-        $user_id = auth()->user()->id;
-        $postReaction = PostCommentReaction::query()
-            ->where('user_id', $user_id)
-            ->where('comment_id', $postComment->id)
-            ->firstOrFail();
-
-        $postReaction->delete();
+        $this->service->delete($postComment->id);
 
         return response()->noContent();
     }

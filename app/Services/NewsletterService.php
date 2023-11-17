@@ -23,7 +23,7 @@ class NewsletterService
         );
 
         if(!$newsletter) {
-            throw new \Exception('Unexpected error ocurred.');
+            throw new \ErrorException('Unexpected error ocurred.');
         }
 
         return;
@@ -41,7 +41,7 @@ class NewsletterService
         $deletedNewsletter = $this->repository->delete($newsletterDTO->newsletter->id);
 
         if(! $deletedNewsletter) {
-            throw new \Exception('Unexpected error ocurred.', 500);
+            throw new \ErrorException('Unexpected error ocurred.', 500);
         }
 
 

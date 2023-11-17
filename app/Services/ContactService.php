@@ -23,7 +23,7 @@ class ContactService
         ]);
 
         if(!$createdContact){
-            throw new \Exception("Unexpected error ocurred");
+            throw new \ErrorException("Unexpected error ocurred");
         }
 
         return $createdContact;

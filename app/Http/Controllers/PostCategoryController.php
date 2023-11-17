@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Adapters\PaginationAdapter;
+use App\DTOs\PostCategory\CreatePostCategoryDTO;
+use App\Http\Requests\PostCategory\CreatePostCategoryRequest;
+use App\Http\Requests\PostCategory\UpdatePostCategoryRequest;
 use App\Models\PostCategory;
 use App\Services\PostCategoryService;
 use Illuminate\Http\Request;
@@ -10,12 +13,11 @@ use Illuminate\Validation\Rule;
 
 class PostCategoryController extends Controller
 {
-    public function __construct(protected PostCategoryService $postCategoryService)
-    {}
+    public function __construct(
+        protected PostCategoryService $service
+    ){}
 
     public function index(Request $request){
-        // $this->authorize('is_admin');
-
         $categories = PostCategory::all();
 
         return response($categories);
@@ -29,7 +31,7 @@ class PostCategoryController extends Controller
         $search = $request->query('search', null);
 
 
-        return response(PaginationAdapter::toJson($this->postCategoryService->paginate(
+        return response(PaginationAdapter::toJson($this->service->paginate(
             page: $page,
             perPage: $perPage,
             isTrash: $is_trash,
@@ -37,76 +39,41 @@ class PostCategoryController extends Controller
         )));
     }
 
-    public function store(Request $request)
+    public function store(CreatePostCategoryRequest $request)
     {
-        $this->authorize('is_admin');
-
-        $request->validate([
-            'name' => ['required', 'string', 'max:50', 'unique:post_categories,name'],
-            'description' => ['required', 'string', 'max:255']
-        ]);
-
-        $payload = $request->only('name', 'description');
-        $slug = str()->slug($payload['name']);
-
-        $alreadyExistSlug = PostCategory::where('slug', $slug)->first();
-
-        while($alreadyExistSlug){
-            $alreadyExistSlug = PostCategory::where('slug', $slug)->first();
-            $slug = $slug . rand(1,20);
-        }
-
-        $postCategory = PostCategory::create([
-            'name' => $payload['name'],
-            'slug' => $slug,
-            'description' => $payload['description']
-        ]);
+        $postCategory = $this->service->store(
+            new CreatePostCategoryDTO(
+                $request->validated('name'),
+                $request->validated('description'),
+            )
+        );
 
         return response($postCategory, 201);
-
     }
 
-    public function show(string|int $param)
+    public function show(string|int $slugOrId)
     {
-        $postCategory = PostCategory::query()->where('id', $param)->orWhere('slug', $param)->firstOrFail();
-        return response($postCategory);
+        $postCategory = $this->service->show($slugOrId);
+
+        return response()->json($postCategory);
     }
 
     public function getPopular(Request $request)
     {
         $limit = $request->query('limit', 5);
-        $categories = $this->postCategoryService->getPopular($limit);
-        return response($categories);
+        $categories = $this->service->getPopular($limit);
+
+        return response()->json($categories);
     }
 
-    public function update(Request $request, PostCategory $postCategory)
+    public function update(UpdatePostCategoryRequest $request, PostCategory $postCategory)
     {
-        $this->authorize('is_admin');
-
-
-        $request->validate([
-            'name' => [
-                'string',
-                'max:50',
-                // $payload['name'] && 'unique:post_categories,name',
-                Rule::unique('post_categories')->ignore($postCategory->id)
-            ],
-            'slug' => [
-                'string',
-                'max:255',
-                //  $payload['slug']  && 'unique:post_categories,slug',
-                Rule::unique('post_categories')->ignore($postCategory->id)
-            ],
-            'description' => ['string', 'max:255']
-        ]);
-
         $payload = $request->only('name', 'description', 'slug');
-
 
         $postCategory->update($payload);
         $postCategory->fresh();
 
-        return response($postCategory);
+        return response()->noContent();
     }
 
     public function destroy(PostCategory $postCategory)

@@ -12,10 +12,9 @@ class UpdatePostCategoryTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    // protected $path = "/api/postCategory/";
     protected function path(int $categoryId): string
     {
-        return "/api/postCategory/{$categoryId}";
+        return "/api/category/{$categoryId}";
     }
 
     public function test_it_should_update_a_post_category(): void
@@ -32,7 +31,7 @@ class UpdatePostCategoryTest extends TestCase
         $response = $this->actingAs($user)
             ->putJson($this->path($postCategory->id), $payload);
 
-        $response->assertOk();
+        $response->assertNoContent();
     }
 
     public function test_it_should_return_422_when_category_name_already_exists():void

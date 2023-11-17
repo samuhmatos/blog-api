@@ -12,7 +12,7 @@ class CreatePostCategoryTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    protected $path = "/api/postCategory/";
+    protected $path = "/api/category/";
 
     public function test_it_should_create_a_post_category(): void
     {

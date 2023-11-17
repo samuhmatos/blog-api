@@ -16,7 +16,6 @@ class UpdatePostCommentTest extends TestCase
     use WithFaker;
     public function test_it_should_update_the_post_comment(): void
     {
-        // $this->seed();
         User::factory()->set('is_admin', true)->create();
         PostCategory::factory()->create();
         Post::factory()->create();
@@ -61,9 +60,9 @@ class UpdatePostCommentTest extends TestCase
 
     public function test_it_should_return_422_when_not_providing_data():void
     {
-        $user = User::factory()->set('is_admin', true)->crate();
+        $user = User::factory()->set('is_admin', true)->create();
         PostCategory::factory()->create();
-        $post = Post::factory()->crate();
+        $post = Post::factory()->create();
         $postComment = PostComment::factory()->set('post_id', $post->id)->create();
 
         $response = $this->actingAs($user)->patchJson("/api/comment/{$postComment->id}");

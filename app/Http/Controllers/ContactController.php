@@ -14,18 +14,14 @@ class ContactController extends Controller
     ){}
     public function store(ContactRequest $request)
     {
-        try{
-            $this->service->store(new ContactDTO(
-                email: $request->validated('email'),
-                name: $request->validated('name'),
-                phone: $request->validated('phone'),
-                subject: $request->validated('subject'),
-                message: $request->validated('message'),
-            ));
+        $this->service->store(new ContactDTO(
+            email: $request->validated('email'),
+            name: $request->validated('name'),
+            phone: $request->validated('phone'),
+            subject: $request->validated('subject'),
+            message: $request->validated('message'),
+        ));
 
-            return response()->noContent();
-        }catch(\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->noContent();
     }
 }

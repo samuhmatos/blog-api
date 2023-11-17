@@ -24,7 +24,7 @@ class PostCommentService {
         ]);
 
         if(!$createdComment) {
-            throw new \Exception("Unexpected error ocurred");
+            throw new \ErrorException("Unexpected error ocurred");
         }
 
         return $createdComment->load('user');
@@ -38,7 +38,7 @@ class PostCommentService {
 
 
         if(!$update) {
-            throw new \Exception("Unexpected error ocurred");
+            throw new \ErrorException("Unexpected error ocurred");
         }
 
         $comment = $this->repository->find($params->id);
@@ -51,7 +51,7 @@ class PostCommentService {
         $removedComment =  $this->repository->delete($param->id);
 
         if(!$removedComment) {
-            throw new \Exception("Unexpected error ocurred");
+            throw new \ErrorException("Unexpected error ocurred");
         }
 
         return true;

@@ -3,10 +3,10 @@
 use App\Http\Controllers\PostCategoryController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('/postCategory')->group(function (){
-    Route::get('', [PostCategoryController::class, 'index']);
-    Route::get('/get/{postCategory}', [PostCategoryController::class, 'show']);
-    Route::get('/paginate', [PostCategoryController::class, 'paginate']);
+Route::prefix('/category')->group(function (){
+    Route::get('', [PostCategoryController::class, 'paginate']);
+    Route::get('/all', [PostCategoryController::class, 'index']);
+    Route::get('/get/{slugOrId}', [PostCategoryController::class, 'show']);
     Route::get('/filter/popular', [PostCategoryController::class, 'getPopular']);
 
     Route::middleware('auth:sanctum')->group(function (){

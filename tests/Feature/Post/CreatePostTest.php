@@ -16,12 +16,11 @@ class CreatePostTest extends TestCase
     public function test_it_should_create_a_post(): void
     {
         $user = User::factory()->set('is_admin', true)->create();
-
         $category = PostCategory::factory()->create();
+        Post::factory()->count(3)->create();
 
         Storage::fake('post_banner');
         $file = UploadedFile::fake()->image('post_banner.jpg');
-
 
         $post = [
             'title' => "This is the title's post",
@@ -29,7 +28,10 @@ class CreatePostTest extends TestCase
             'content' => "This is the content of the post",
             'banner'=> $file,
             'is_draft' => false,
-            'category_id'=> $category->id
+            'category_id'=> $category->id,
+            'img_content_list' => [
+                "http://localhost:8000/storage/uploads/posts/contents/DQEd39K3i4zZNhx1sYO1utsoArRVnL1lSE0ZNx6T.jpg"
+            ]
         ];
 
         $response = $this->actingAs($user)->postJson('/api/post', $post);

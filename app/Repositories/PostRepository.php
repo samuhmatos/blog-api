@@ -8,7 +8,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
-class PostRepository{
+class PostRepository extends Repository{
+    protected $model = Post::class;
     public function __construct(
         protected Post $post
     ){}
@@ -16,18 +17,20 @@ class PostRepository{
     public function paginate(
         int $page,
         int $perPage,
-        string|null $filter,
+        string|null $search,
         bool $isDraft,
         bool $isTrash,
         string|null $categorySlug,
     ): PaginationInterface
     {
-        $result = Post::withTrashed($isTrash)->with(['category', 'author'])
-            ->where(function (Builder $query) use ($filter, $isDraft, $isTrash, $categorySlug) {
-                if ($filter) {
-                    $query->where(function (Builder $subquery) use ($filter) {
-                        $subquery->where('title', 'like', "%{$filter}%")
-                                 ->orWhere('sub_title', 'like', "%{$filter}%");
+        $result = $this->model()
+            ->query()
+            ->withTrashed($isTrash)->with(['category', 'author'])
+            ->where(function (Builder $query) use ($search, $isDraft, $isTrash, $categorySlug) {
+                if ($search) {
+                    $query->where(function (Builder $subquery) use ($search) {
+                        $subquery->where('title', 'like', "%{$search}%")
+                                 ->orWhere('sub_title', 'like', "%{$search}%");
                     });
                 }
 
@@ -53,7 +56,9 @@ class PostRepository{
 
     public function getMostViewed(int $limit = 3): Collection
     {
-        return Post::with(['category', 'author'])
+        return $this->model()
+            ->query()
+            ->with(['category', 'author'])
             ->withPostReactionCounts()
             ->orderBy('views','desc')
             ->take($limit)
@@ -62,7 +67,9 @@ class PostRepository{
 
     public function getLatestBest(int $limit, bool $filterWeek = false): Collection
     {
-        return Post::with(['category', 'author'])
+        return $this->model()
+            ->query()
+            ->with(['category', 'author'])
             ->withPostReactionCounts()
             ->where(function (Builder $query) use ($filterWeek){
 
@@ -81,10 +88,17 @@ class PostRepository{
 
     public function getByCategory(string $categorySlug, int $limit): Collection | Post
     {
-        return Post::with(['category', 'author'])
+        return $this->model()
+            ->query()
+            ->with(['category', 'author'])
             ->withPostReactionCounts()
-            ->join('post_categories', 'post_categories.id', '=', 'posts.category_id')
-            ->where('post_categories.slug', $categorySlug)
+            ->where(function (Builder $query) use ($categorySlug){
+                $query->whereHas('category', function (Builder $subQuery) use ($categorySlug){
+                    $subQuery->where('slug', $categorySlug);
+                });
+            })
+            // ->join('post_categories', 'post_categories.id', '=', 'posts.category_id')
+            // ->where('post_categories.slug', $categorySlug)
             ->orderByDesc('views')
             ->take($limit)
             ->get();
@@ -92,7 +106,9 @@ class PostRepository{
 
     public function getOne(string|int $param): Post
     {
-        return Post::with(['author', 'category'])
+        return $this->model()
+            ->query()
+            ->with(['author', 'category'])
             ->where('is_draft', false)
             ->where('slug', $param)
             ->orWhere('id', $param)
@@ -114,5 +130,6 @@ class PostRepository{
                     ->withUserReaction();
             }]);
     }
+    
 
 }

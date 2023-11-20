@@ -14,6 +14,7 @@ use Tests\TestCase;
 class UpdatePostTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
+
     public function test_it_should_update_a_post(): void
     {
         $categories = PostCategory::factory()->count(3)->create();
@@ -35,11 +36,11 @@ class UpdatePostTest extends TestCase
 
         $response = $this->actingAs($user)->putJson("/api/post/$post->id", $newPost);
 
-        $response->assertOk();
+        $response->assertNoContent();
     }
     public function test_it_should_return_422_when_not_providing_data():void
     {
-        $categories = PostCategory::factory()->count(3)->create();
+        PostCategory::factory()->count(3)->create();
         $user = User::factory()->set('is_admin', true)->create();
         $post = Post::factory()->create();
 
@@ -50,8 +51,8 @@ class UpdatePostTest extends TestCase
     }
 
     public function test_it_should_return_401_when_user_is_not_authenticated(){
-        $categories = PostCategory::factory()->count(3)->create();
-        $user = User::factory()->set('is_admin', true)->create();
+        PostCategory::factory()->count(3)->create();
+        User::factory()->set('is_admin', true)->create();
         $post = Post::factory()->create();
 
 

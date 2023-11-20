@@ -4,20 +4,24 @@
 namespace App\Http\Controllers;
 
 use App\Adapters\PaginationAdapter;
-use App\Http\Requests\PostRequest;
+use App\DTOs\Post\CreatePostDTO;
+use App\DTOs\Post\PaginatePostDTO;
+use App\DTOs\Post\UpdatePostDTO;
+use App\Http\Requests\Post\CreatePostRequest;
+use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Post;
-use App\Services\PostServices;
+use App\Services\PostService\PostService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
 
     public function __construct(
-        protected PostServices $postServices
+        protected PostService $service,
     ){}
 
     private function paginate(
@@ -29,39 +33,23 @@ class PostController extends Controller
         $page =  $request->query('page', 1);
         $perPage = $request->query('per_page', 10);
         $search = $request->query('search');
-        $categorySlug = $request->query('category', null);
+        $categorySlug = $request->query('category');
 
 
         return response(
             PaginationAdapter::toJson(
-                $this->postServices->paginate(
-                    page:$page,
-                    perPage: $perPage,
-                    search: $search,
-                    isDraft: $isDraft,
-                    isTrash: $isTrash,
-                    categorySlug: $categorySlug,
+                $this->service->paginate(
+                    new PaginatePostDTO(
+                        page:$page,
+                        perPage: $perPage,
+                        search: $search,
+                        isDraft: $isDraft,
+                        isTrash: $isTrash,
+                        categorySlug: $categorySlug,
+                    )
                 )
             )
         );
-    }
-
-    public function index(Request $request)
-    {
-        $query = $request->query('category');
-
-        if($query == "popular"){
-            $data =  $this->postServices->getPopular();
-        }else if($query == "best"){
-            $data = $this->postServices->getLatestBest();
-        }else{
-            $data = $this->postServices->getByCategory($query);
-        }
-
-        if($data)
-            return response($data);
-        else
-            throw new NotFoundHttpException("Not Found category");
     }
 
     public function paginateFeed(Request $request)
@@ -83,11 +71,20 @@ class PostController extends Controller
         return $this->paginate($request, false, true);
     }
 
-    public function suggestion()
+    public function index(Request $request)
     {
-        $posts = $this->postServices->getPopular(15);
+        $query = $request->query('category');
 
-        return response($posts->random(2));
+        if(!$query)
+            throw new NotFoundHttpException("Not Found category");
+
+
+        $data = $this->service->filterByCategory($query);
+
+        if($data)
+            return response($data);
+        else
+            throw new NotFoundHttpException("Not Found category");
     }
 
     public function storeView(Post $post)
@@ -99,39 +96,21 @@ class PostController extends Controller
     }
 
 
-    public function store(PostRequest $request)
+    public function store(CreatePostRequest $request)
     {
-        $this->authorize('is_admin');
-        $request->validate(['title'=> 'unique:posts']);
+        $imageContentList = $this->getImageContentList($request->input('img_content_list'));
 
-        $payload = $request->only(['title', 'sub_title', 'content', 'category_id', 'is_draft']);
-        $imageContentList = $request->only('img_content_list');
-        $banner = $request->file('banner');
-
-
-
-        if($banner){
-            $lastPostId = Post::latest()->first()->id + 1;
-
-            $image_url = $banner->store("/uploads/posts/{$lastPostId}/banners");
-            $payload['image_url'] = $image_url;
-        }
-
-        $payload['slug'] = str()->slug($payload['title']);
-        $payload['author_id'] = auth()->user()->id;
-
-        if(!is_array($imageContentList)){
-            throw new UnsupportedMediaTypeHttpException('O campo img_content_list precisa ser uma array');
-        }
-
-
-        foreach ($imageContentList as $key => $value) {
-            $path = Storage::urlToPath($payload);
-            return $path;
-        }
-
-        $post = Post::create($payload);
-
+        $post = $this->service->store(
+            new CreatePostDTO(
+                title: $request->title,
+                subTitle: $request->sub_title,
+                content: $request->content,
+                categoryId: $request->category_id,
+                isDraft: $request->is_draft,
+                banner: $request->file('banner'),
+                imageContentList: $imageContentList
+            )
+        );
 
         return response($post, 201);
     }
@@ -155,7 +134,7 @@ class PostController extends Controller
 
     public function show(string $param)
     {
-        $post = $this->postServices->getOne($param);
+        $post = $this->service->getOne($param);
         return response($post);
     }
 
@@ -163,26 +142,25 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
-        $this->authorize('is_admin');
+        $imageContentList = $this->getImageContentList($request->input('img_content_list'));
 
-        $payload = $request->only(['title', 'sub_title', 'content', 'category_id', 'is_draft']);
-        $banner = $request->file('banner');
+        $updatedPost  = $this->service->update(
+            new UpdatePostDTO(
+                postId: $post->id,
+                title: $request->title,
+                subTitle: $request->sub_title,
+                content: $request->content,
+                categoryId: $request->category_id,
+                isDraft: $request->is_draft,
+                banner: $request->file('banner'),
+                imageUrl: $post->image_url,
+                imageContentList: $imageContentList
+            )
+        );
 
-        $payload['slug'] = str()->slug($payload['title']);
-        $payload['author_id'] = auth()->user()->id;
-
-        if($banner){
-            Storage::delete($post->image_url);
-
-            $image_url = $banner->store("/uploads/posts/{$post->id}/banners/");
-            $payload['image_url'] = $image_url;
-        }
-
-        $post->update($payload);
-
-        return response($post);
+        return response($updatedPost);
     }
 
     /**
@@ -202,6 +180,25 @@ class PostController extends Controller
         $post = Post::withTrashed()->findOrFail($post_id);
         $post->restore();
         return response($post);
+    }
+
+    private function getImageContentList($list):Array
+    {
+        if(is_null($list) || !$list){
+            return [];
+        }
+
+        $imageContentList = $list;
+
+        if(!is_array($imageContentList)){
+            try{
+                $imageContentList = json_decode($imageContentList);
+            }catch(\Exception $e){
+                throw new UnsupportedMediaTypeHttpException('O campo img_content_list precisa ser uma array');
+            }
+        }
+
+        return $imageContentList;
     }
 }
 

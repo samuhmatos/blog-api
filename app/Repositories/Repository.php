@@ -50,4 +50,11 @@ class Repository implements IRepository {
             ->query()
             ->updateOrCreate($atributes, $values);
     }
+
+    public function latest():Model|null
+    {
+        return $this->model()->query()
+            ->latest()
+            ->first();
+    }
 }

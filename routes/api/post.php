@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('/post')->group(function(){
     Route::get('', [PostController::class, 'index']);
     Route::get('/paginate', [PostController::class, 'paginateFeed']);
-    Route::get('/suggestion', [PostController::class, 'suggestion']);
 
     Route::get('filter/{slug}',[PostController::class, 'show'])->middleware('guard');
 
@@ -21,8 +20,9 @@ Route::middleware(['auth:sanctum'])->prefix('/post')->group(function (){
     Route::post('',[PostController::class, 'store']);
     Route::delete('/{post}', [PostController::class, 'destroy']);
     Route::post('/upload-content', [PostController::class, 'uploadSourceContent']);
-    Route::get('/draft', [PostController::class, 'paginateDrafts']);
-    Route::get('/trash', [PostController::class, 'paginateTrash']);
+
+    Route::get('/paginate/draft', [PostController::class, 'paginateDrafts']);
+    Route::get('/paginate/trash', [PostController::class, 'paginateTrash']);
 
     Route::get('/{post}/reaction', [PostReactionController::class, 'show']);
     Route::post('/{post}/reaction',[PostReactionController::class, 'store']);

@@ -17,6 +17,8 @@ interface IRepository {
     public function create(array $parameters):Model|null;
 
     public function updateOrCreate(array $atributes, array $values):Model|null;
+
+    public function latest():Model|null;
 }
 
 ?>

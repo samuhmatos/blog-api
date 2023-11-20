@@ -28,8 +28,7 @@ class PostCommentController extends Controller
             )
         );
 
-        return response()
-            ->json($createdComment, 201);
+        return response($createdComment, 201);
     }
 
     public function update(UpdatePostCommentRequest $request, PostComment $postComment)
@@ -38,7 +37,7 @@ class PostCommentController extends Controller
             new UpdatePostCommentDTO($postComment->id, $request->comment)
         );
 
-        return response()->json($comment);
+        return response($comment);
     }
 
     public function destroy(PostComment $postComment)

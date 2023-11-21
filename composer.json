@@ -1,10 +1,11 @@
 {
-    "name": "laravel/laravel",
+    "name": "Blog APi",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Blog API.",
     "keywords": [
-        "laravel",
-        "framework"
+        "Blog",
+        "API",
+        "Back End"
     ],
     "license": "MIT",
     "require": {

@@ -5,7 +5,6 @@ namespace Tests\Feature\PostCategory;
 use App\Models\PostCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class DeletePostCategoryTest extends TestCase
@@ -14,7 +13,7 @@ class DeletePostCategoryTest extends TestCase
 
     protected function path(int $categoryId): string
     {
-        return "/api/postCategory/{$categoryId}";
+        return "/api/category/{$categoryId}";
     }
 
     public function test_it_should_delete_category(): void

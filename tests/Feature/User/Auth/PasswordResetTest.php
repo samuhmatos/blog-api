@@ -13,13 +13,15 @@ class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $path = "/api/auth/forgot-password";
+
     public function test_reset_password_link_can_be_requested(): void
     {
         Notification::fake();
 
         $user = User::factory()->create();
 
-        $this->postJson('/api/forgot-password', ['email' => $user->email]);
+        $this->postJson($this->path, ['email' => $user->email]);
 
         Notification::assertSentTo($user, ResetPassword::class);
     }
@@ -30,7 +32,7 @@ class PasswordResetTest extends TestCase
 
         $user = User::factory()->create();
 
-        $this->postJson('/api/forgot-password', ['email' => $user->email]);
+        $this->postJson($this->path, ['email' => $user->email]);
 
         Notification::assertSentTo($user, ResetPassword::class, function (object $notification) use ($user) {
             $response = $this->postJson('/api/reset-password', [

@@ -20,13 +20,13 @@ class UpdateUserTest extends TestCase
 
     public function test_it_should_update_the_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->set('is_admin', false)->create();
 
         Storage::fake('user_avatar');
         $file = UploadedFile::fake()->image('user_avatar.jpg');
 
         $response = $this->actingAs($user)
-            ->putJson($this->path($user->id),[
+            ->postJson($this->path($user->id),[
                 'name' => $this->faker->name(),
                 'username'=> str()->slug($this->faker->name()),
                 'image' => $file,
@@ -38,12 +38,12 @@ class UpdateUserTest extends TestCase
 
     public function test_it_should_return_401_when_user_not_match():void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->set('is_admin', false)->create();
 
         Storage::fake('user_avatar');
         $file = UploadedFile::fake()->image('user_avatar.jpg');
 
-        $response = $this->putJson($this->path($user->id),[
+        $response = $this->postJson($this->path($user->id),[
             'name' => $this->faker->name(),
             'username'=> str()->slug($this->faker->name()),
             'image' => $file,
@@ -55,9 +55,9 @@ class UpdateUserTest extends TestCase
 
     public function test_it_should_return_422_when_providing_wrong_confirm_password():void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->set('is_admin', false)->create();
 
-        $response = $this->actingAs($user)->putJson($this->path($user->id),[
+        $response = $this->actingAs($user)->postJson($this->path($user->id),[
             'password' => "newPassword"
         ]);
 

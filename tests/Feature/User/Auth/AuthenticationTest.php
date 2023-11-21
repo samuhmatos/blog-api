@@ -10,7 +10,7 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $path = '/api/login';
+    protected $path = '/api/auth/login';
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {

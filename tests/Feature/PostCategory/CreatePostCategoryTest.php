@@ -58,8 +58,6 @@ class CreatePostCategoryTest extends TestCase
 
     public function test_it_should_return_401_when_user_are_not_authenticated():void
     {
-        $user = User::factory()->set('is_admin', true)->create();
-
         $payload = [
             'name' => 'Category Test',
             'description' => $this->faker->realText(255)

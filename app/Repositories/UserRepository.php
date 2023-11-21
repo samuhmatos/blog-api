@@ -3,12 +3,11 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use App\Repositories\Contracts\PaginationInterface;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Hash;
 
-class UserRepository {
+class UserRepository extends Repository {
+
+    protected $model = User::class;
 
     public function paginate(
         int $page,
@@ -34,26 +33,6 @@ class UserRepository {
             ->paginate($perPage, ['*'], 'page', $page);
 
         return new PaginationPresenter($result);
-    }
-
-    public function create(
-        string $name,
-        string $username,
-        string $email,
-        string $password,
-        bool $isAdmin
-    ): User
-    {
-        $user = User::create([
-            'name' => $name,
-            'username'=> $username,
-            'email' => $email,
-            'image_url'=> null,
-            'password' => Hash::make($password),
-            'is_admin' => $isAdmin
-        ]);
-
-        return $user;
     }
 
     public function findOneByUsername($username): User|null

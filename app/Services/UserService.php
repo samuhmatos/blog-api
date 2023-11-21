@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Repositories\Contracts\PaginationInterface;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Hash;
 
 class UserService {
     public function __construct(
@@ -31,10 +32,9 @@ class UserService {
             do {
                 $existUsername = $this->userRepository
                                     ->findOneByUsername($username);
+
                 $username = $username . rand(1,300);
             } while ($existUsername);
-
-            return $existUsername;
         }
 
         return $username;
@@ -46,15 +46,16 @@ class UserService {
         string $email,
         string $password,
         bool $isAdmin = false
-    ): User
+    )
     {
-        return $this->userRepository->create(
-            $name,
-            $username,
-            $email,
-            $password,
-            $isAdmin,
-        );
+        return $this->userRepository->create([
+                'name' => $name,
+                'username'=> $username,
+                'email' => $email,
+                'image_url'=> null,
+                'password' => Hash::make($password),
+                'is_admin' => $isAdmin
+            ]);
     }
 }
 

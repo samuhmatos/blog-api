@@ -21,7 +21,7 @@ class PostCommentReactionController extends Controller
             'type' => ['required', 'string', new Enum(ReactionType::class)]
         ]);
 
-        $type = $request->type == ReactionType::LIKE
+        $type = $request->type == "LIKE"
             ? ReactionType::LIKE
             : ReactionType::UNLIKE;
 

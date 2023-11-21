@@ -40,7 +40,10 @@ class PostReactionController extends Controller
     public function destroy(Post $post)
     {
         $user_id = auth()->user()->id;
-        $postReaction = PostReaction::query()->where('user_id', $user_id)->where('post_id', $post->id)->firstOrFail();
+        $postReaction = PostReaction::query()
+            ->where('user_id', $user_id)
+            ->where('post_id', $post->id)
+            ->firstOrFail();
         $postReaction->delete();
 
         return response()->noContent();

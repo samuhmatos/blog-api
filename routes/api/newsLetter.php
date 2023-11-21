@@ -4,8 +4,8 @@ use App\Http\Controllers\NewsLetterController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::post('/newsletter', [NewsLetterController::class, 'subscribe']);
-Route::delete('/newsletter/{newsletter:email}', [NewsLetterController::class, 'unsubscribe']);
+Route::post('', [NewsLetterController::class, 'subscribe']);
+Route::delete('/{newsletter:email}', [NewsLetterController::class, 'unsubscribe']);
 
 
 ?>

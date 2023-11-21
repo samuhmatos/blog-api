@@ -11,7 +11,7 @@ class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $PATH = "/api/register";
+    protected $PATH = "/api/auth/register";
 
     public function test_new_users_can_register(): void
     {

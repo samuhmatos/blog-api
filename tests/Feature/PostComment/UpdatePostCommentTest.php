@@ -10,18 +10,21 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class UpdatePostCommentTest extends TestCase
+class UpdatePostCommentTest extends TestBase
 {
     use RefreshDatabase;
     use WithFaker;
+
+    protected function path(int $commentId):string
+    {
+        return "/api/comment/{$commentId}";
+    }
+
     public function test_it_should_update_the_post_comment(): void
     {
-        User::factory()->set('is_admin', true)->create();
-        PostCategory::factory()->create();
-        Post::factory()->create();
-        $userCommentOwner = User::factory()->create();
-
-        $post = Post::first();
+        $data = $this->init();
+        $userCommentOwner = $data['user'];
+        $post = $data['post'];
 
         $postComment = PostComment::factory()
             ->set('post_id', $post->id)
@@ -32,18 +35,19 @@ class UpdatePostCommentTest extends TestCase
             'comment' => "New message content"
         ];
 
-        $response = $this->actingAs($userCommentOwner)->patchJson("/api/comment/{$postComment->id}", $payload);
+        $response = $this->actingAs($userCommentOwner)
+            ->patchJson($this->path($postComment->id), $payload);
 
         $response->assertOk();
     }
 
     public function test_it_should_return_403_when_user_is_not_the_owner_comment():void
     {
-        $userCommentOwner = User::factory()->create();
-        $user = User::factory()->set('is_admin', true)->create();
+        $data = $this->init();
+        $userCommentOwner = $data['user'];
+        $userRandom = $data['userAdmin'];
+        $post = $data['post'];
 
-        PostCategory::factory()->create();
-        $post = Post::factory()->create();
         $postComment = PostComment::factory()
             ->set('post_id', $post->id)
             ->set('user_id', $userCommentOwner->id)
@@ -53,30 +57,37 @@ class UpdatePostCommentTest extends TestCase
             'comment' => "New message content"
         ];
 
-        $response = $this->actingAs($user)->patchJson("/api/comment/{$postComment->id}", $payload);
+        $response = $this->actingAs($userRandom)
+            ->patchJson($this->path($postComment->id), $payload);
 
         $response->assertForbidden();
     }
 
     public function test_it_should_return_422_when_not_providing_data():void
     {
-        $user = User::factory()->set('is_admin', true)->create();
-        PostCategory::factory()->create();
-        $post = Post::factory()->create();
-        $postComment = PostComment::factory()->set('post_id', $post->id)->create();
+        $data = $this->init();
+        $user = $data['user'];
+        $post = $data['post'];
 
-        $response = $this->actingAs($user)->patchJson("/api/comment/{$postComment->id}");
+        $postComment = PostComment::factory()
+            ->set('post_id', $post->id)
+            ->set('user_id', $user->id)
+            ->create();
+
+        $response = $this->actingAs($user)
+            ->patchJson($this->path($postComment->id));
 
         $response->assertUnprocessable();
     }
 
     public function test_it_should_return_401_when_user_is_not_authenticated():void
     {
-        PostCategory::factory()->create();
-        $post = Post::factory()->create();
+        $data = $this->init();
+        $post = $data['post'];
+
         $postComment = PostComment::factory()->set('post_id', $post->id)->create();
 
-        $response = $this->patchJson("/api/comment/{$postComment->id}");
+        $response = $this->patchJson($this->path($postComment->id));
 
         $response->assertUnauthorized();
     }

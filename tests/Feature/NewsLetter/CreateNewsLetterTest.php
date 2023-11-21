@@ -19,8 +19,6 @@ class CreateNewsLetterTest extends TestCase
             'email' => $this->faker->email()
         ]);
 
-        $response->dump();
-
         $response->assertNoContent();
     }
 

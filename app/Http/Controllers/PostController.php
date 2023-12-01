@@ -1,6 +1,4 @@
 <?php
-//TODO: CRIAR NOVA COLUNA NO BANCO DE DADOS PARA PODER guardar todas as imagens que estao sendo usadas no conteudo da postagem. E se remover ou editar, o sistema deve fazer essa filtragem, atualizar o banco de dados e remover/editar o que for necessário no storage. Suesttão: guardar em uma array/objeto
-
 namespace App\Http\Controllers;
 
 use App\Adapters\PaginationAdapter;

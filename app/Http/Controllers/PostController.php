@@ -182,15 +182,15 @@ class PostController extends Controller
 
     private function getImageContentList($list):Array
     {
-        if(is_null($list) || !$list){
-            return [];
+        $imageContentList = [];
+
+        if(is_null($list) || $list == "null" || !$list){
+            return $imageContentList;
         }
 
-        $imageContentList = $list;
-
-        if(!is_array($imageContentList)){
+        if(!is_array($list)){
             try{
-                $imageContentList = json_decode($imageContentList);
+                $imageContentList = json_decode($list, true, 512, JSON_THROW_ON_ERROR);
             }catch(\Exception $e){
                 throw new UnsupportedMediaTypeHttpException('O campo img_content_list precisa ser uma array');
             }

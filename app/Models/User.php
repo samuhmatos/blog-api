@@ -63,7 +63,7 @@ class User extends Authenticatable
 
     public function newsletter(): HasOne
     {
-        return $this->hasOne(NewsLetter::class, 'email', 'email');
+        return $this->hasOne(Newsletter::class, 'email', 'email');
     }
 
 }

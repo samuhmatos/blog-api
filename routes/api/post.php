@@ -4,14 +4,12 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReactionController;
 use Illuminate\Support\Facades\Route;
 
-// Route::prefix('/post')->group(function(){
-    Route::get('', [PostController::class, 'index']);
-    Route::get('/paginate', [PostController::class, 'paginateFeed']);
+Route::get('', [PostController::class, 'index']);
+Route::get('/paginate', [PostController::class, 'paginateFeed']);
 
-    Route::get('filter/{slug}',[PostController::class, 'show'])->middleware('guard');
+Route::get('filter/{slug}',[PostController::class, 'show'])->middleware('guard');
 
-    Route::post('/{post}/view',[PostController::class, 'storeView']);
-// });
+Route::post('/{post}/view',[PostController::class, 'storeView']);
 
 
 Route::middleware(['auth:sanctum'])->group(function (){

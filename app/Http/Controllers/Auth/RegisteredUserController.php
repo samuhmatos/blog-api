@@ -32,25 +32,7 @@ class RegisteredUserController extends Controller
      */
     public function store(RegisterRequest $request): Response
     {
-        // $username = str()->slug($request->name);
-        // $alreadyExistUsername = User::where('username', $username)->first();
-
         $username = $this->userService->createUsername($request->name);
-
-        // if($alreadyExistUsername){
-        //     do {
-        //         $existUsername = User::where('username', $username)->first();
-        //         $username = $username . rand(1,300);
-        //     } while ($existUsername);
-        // }
-
-        // $user = User::create([
-        //     'name' => $request->name,
-        //     'username'=> $username,
-        //     'email' => $request->email,
-        //     'image_url'=> null,
-        //     'password' => Hash::make($request->password),
-        // ]);
 
         $user = $this->userService->create(
             name: $request->name,
@@ -68,14 +50,10 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
-        $token = $request->user()->createToken('user:register');
-
 
         return response(
             [
-                'user' => $request->user(),
-                'token' => $token->plainTextToken,
+                'user' => $user,
             ]
         ,201);
     }

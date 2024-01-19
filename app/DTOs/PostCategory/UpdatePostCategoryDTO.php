@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTos\PostCategory;
+namespace App\DTOs\PostCategory;
 
 class UpdatePostCategoryDTO
 {

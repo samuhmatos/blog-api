@@ -39,6 +39,13 @@ class Repository implements IRepository {
             ->find($id);
     }
 
+    public function findOrFail(int $id): Model| null
+    {
+        return $this->model()
+            ->query()
+            ->findOrFail($id);
+    }
+
     public function all(): Collection
     {
         return $this->model()::all();

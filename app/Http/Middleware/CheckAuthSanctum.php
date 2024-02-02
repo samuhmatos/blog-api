@@ -12,7 +12,11 @@ class CheckAuthSanctum
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->bearerToken()) {
-            Auth::setUser(Auth::guard('sanctum')->user());
+            $user = Auth::guard('sanctum')->user();
+
+            if($user){
+                Auth::setUser($user);
+            }
         }
 
         return $next($request);

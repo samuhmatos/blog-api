@@ -37,7 +37,7 @@ class UpdatePostTest extends PostBase
         ];
 
         $response = $this->actingAs($user)
-            ->putJson($this->path($post->id), $newPost);
+            ->postJson($this->path($post->id), $newPost);
 
         $response->assertOk();
     }
@@ -48,7 +48,7 @@ class UpdatePostTest extends PostBase
         $post = $data['post'];
 
         $response = $this->actingAs($user)
-            ->putJson($this->path($post->id));
+            ->postJson($this->path($post->id));
 
         $response->assertUnprocessable();
     }
@@ -58,8 +58,7 @@ class UpdatePostTest extends PostBase
         $data = $this->init();
         $post = $data['post'];
 
-        $response = $this->putJson($this->path($post->id));
-
+        $response = $this->postJson($this->path($post->id));
 
         $response->assertUnauthorized();
     }
@@ -83,7 +82,7 @@ class UpdatePostTest extends PostBase
             'category_id'=> $category->id
         ];
 
-        $response = $this->actingAs($user)->putJson($this->path($post->id), $newPost);
+        $response = $this->actingAs($user)->postJson($this->path($post->id), $newPost);
 
         $response->assertForbidden();
     }
@@ -106,7 +105,7 @@ class UpdatePostTest extends PostBase
             'category_id'=> $category->id
         ];
 
-        $response = $this->actingAs($user)->putJson("/api/post/1000", $newPost);
+        $response = $this->actingAs($user)->postJson("/api/post/1000", $newPost);
 
         $response->assertNotFound();
     }

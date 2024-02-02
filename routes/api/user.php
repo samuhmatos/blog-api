@@ -5,8 +5,8 @@ use App\Http\Controllers\Auth\UpdateUserController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+// api/user
 Route::middleware('auth:sanctum')
-    // ->prefix('/user')
     ->group(function () {
         Route::post('', [UserController::class, 'store']);
         Route::post('/{user}', [UpdateUserController::class, 'store']);

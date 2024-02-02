@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\PostCommentReports\PaginatePostCommentReportsDTO;
 use App\DTOs\PostComments\CreatePostCommentDTO;
 use App\DTOs\PostComments\DestroyPostCommentDTO;
 use App\DTOs\PostComments\UpdatePostCommentDTO;
@@ -13,6 +14,17 @@ class PostCommentService {
         protected PostCommentRepository $repository
     )
     {}
+
+    public function paginateWithReports(
+        PaginatePostCommentReportsDTO $paginateDTO
+    )
+    {
+        return $this->repository->paginateWithReports(
+            $paginateDTO->page,
+            $paginateDTO->perPage,
+            $paginateDTO->reportsType
+        );
+    }
 
     public function store(CreatePostCommentDTO $params): PostComment
     {
@@ -55,5 +67,11 @@ class PostCommentService {
         }
 
         return true;
+    }
+
+    public function show(int $postCommentId): PostComment
+    {
+        $postComment = $this->repository->findOrFail($postCommentId);
+        return $postComment;
     }
 }

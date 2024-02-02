@@ -2,11 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\Access\Response;
 
 class PostCommentPolicy
 {

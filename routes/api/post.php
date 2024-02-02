@@ -4,16 +4,18 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReactionController;
 use Illuminate\Support\Facades\Route;
 
+// /api/post
+
 Route::get('', [PostController::class, 'index']);
 Route::get('/paginate', [PostController::class, 'paginateFeed']);
 
-Route::get('filter/{slug}',[PostController::class, 'show'])->middleware('guard');
+Route::get('filter/{slug}',[PostController::class, 'show'])->middleware('check.auth');
 
 Route::post('/{post}/view',[PostController::class, 'storeView']);
 
 
 Route::middleware(['auth:sanctum'])->group(function (){
-    Route::put('/{post}',[PostController::class, 'update']);
+    Route::post('/{post}',[PostController::class, 'update']);
     Route::post('/{post}/restore',[PostController::class, 'restore']);
     Route::post('',[PostController::class, 'store']);
     Route::delete('/{post}', [PostController::class, 'destroy']);
@@ -22,8 +24,6 @@ Route::middleware(['auth:sanctum'])->group(function (){
     // post pagination
     Route::get('/paginate/draft', [PostController::class, 'paginateDrafts']);
     Route::get('/paginate/trash', [PostController::class, 'paginateTrash']);
-
-
 
     // post reaction
     Route::get('/{post}/reaction', [PostReactionController::class, 'show']);

@@ -2,30 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
-use App\Models\PostComment;
+use App\DTOs\PostCommentReports\CreatePostCommentReportDTO;
+use App\DTOs\PostCommentReports\UpdatePostCommentReportDTO;
+use App\Http\Requests\PostCommentReportRequest;
 use App\Models\PostCommentReport;
+use App\Services\PostCommentReportService;
 use Illuminate\Http\Request;
 
 class PostCommentReportController extends Controller
 {
-    public function store(Request $request, Post $post, PostComment $postComment)
+    public function __construct(
+        public PostCommentReportService $service
+    ){}
+    public function store(PostCommentReportRequest $request)
     {
-        $this->authorize('matchPost',[$postComment, $post]);
+        $dto = new CreatePostCommentReportDTO($request->comment_id, $request->message);
 
-        $request->validate([
-            'reason' => ['required', 'string', 'max:255'],
-        ]);
-
-        $user = $request->user();
-
-        $report = PostCommentReport::create([
-            'comment_id' => $postComment->id,
-            'user_id' => $user->id,
-            'reason' => $request->reason
-        ]);
+        $this->service->create($dto);
 
         return response()->noContent();
+    }
 
+    public function update(PostCommentReportRequest $request, int $id)
+    {
+        $dto = new UpdatePostCommentReportDTO(
+            $request->status,
+            $id
+        );
+
+        $this->service->update($dto);
+
+        return response()->noContent();
+    }
+
+    public function show(Request $request, int $id)
+    {
+        return $this->service->show($id);
     }
 }

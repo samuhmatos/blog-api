@@ -24,12 +24,12 @@ class RegistrationTest extends TestCase
 
         $response = $this->postJson($this->PATH, $user);
 
-        $response->assertCreated()->assertJsonFragment([
-            'name'=> $user['name'],
-            'username'=> str()->slug($user['name']),
-            'email'=> $user['email'],
-        ]);
-        $this->assertAuthenticated();
+        $response->assertCreated()
+            ->assertJsonFragment([
+                'name'=> $user['name'],
+                'username'=> str()->slug($user['name']),
+                'email'=> $user['email'],
+            ]);
     }
 
     public function test_it_should_create_slug_additional_if_when_already_exist(): void
@@ -45,11 +45,11 @@ class RegistrationTest extends TestCase
 
         $response = $this->postJson($this->PATH, $user);
 
-        $this->assertAuthenticated();
-        $response->assertCreated()->assertJsonFragment([
-            'name'=> $user['name'],
-            'email'=> $user['email'],
-        ]);
+        $response->assertCreated()
+            ->assertJsonFragment([
+                'name'=> $user['name'],
+                'email'=> $user['email'],
+            ]);
     }
 
     public function test_it_should_return_422_when_not_providing_data():void

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Adapters\PaginationAdapter;
+use App\DTOs\PostCommentReports\PaginatePostCommentReportsDTO;
 use App\DTOs\PostComments\CreatePostCommentDTO;
 use App\DTOs\PostComments\DestroyPostCommentDTO;
 use App\DTOs\PostComments\UpdatePostCommentDTO;
@@ -16,6 +18,21 @@ class PostCommentController extends Controller
     public function __construct(
         protected PostCommentService $service
     ){}
+
+    public function index(Request $request)
+    {
+        $page = $request->get('page', 1);
+        $perPage = $request->get('per_page', 10);
+        $reportsType = $request->get('reports_type');
+
+        $paginateDTO = new PaginatePostCommentReportsDTO($page, $perPage, $reportsType);
+
+        return response(
+            PaginationAdapter::toJson(
+                $this->service->paginateWithReports($paginateDTO)
+            )
+        );
+    }
 
     public function store(CreatePostCommentRequest $request)
     {

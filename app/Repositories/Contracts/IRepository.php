@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 interface IRepository {
     public function find(int $id): Model|null;
+    public function findOrFail(int $id): Model|null;
 
     public function all(): Collection;
 

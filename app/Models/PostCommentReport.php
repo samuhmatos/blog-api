@@ -14,7 +14,8 @@ class PostCommentReport extends Model
     protected $fillable = [
         'comment_id',
         'user_id',
-        'reason',
+        'message',
+        'status'
     ];
 
     protected $hidden = [
@@ -24,5 +25,10 @@ class PostCommentReport extends Model
     public function comment(): BelongsTo
     {
         return $this->belongsTo(PostComment::class);
+    }
+
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

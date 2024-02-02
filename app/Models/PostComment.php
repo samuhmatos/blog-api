@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ReportsType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -48,6 +49,11 @@ class PostComment extends Model
         return $this->hasMany(PostCommentReaction::class);
     }
 
+    public function reports():HasMany
+    {
+        return $this->hasMany(PostCommentReport::class, 'comment_id');
+    }
+
     public function scopeWithReactionCounts(Builder $query)
     {
         return $query
@@ -77,5 +83,22 @@ class PostComment extends Model
                 ->whereColumn('comment_id', 'post_comments.id')
                 ->where('user_id', auth()->check() ? auth()->id() : null);
         }, 'user_reaction');
+    }
+
+    public function scopeWithCommentToPublic(Builder $query)
+    {
+        return $query
+            ->with('user')
+            ->withReactionCounts()
+            ->withUserReaction()
+            ->where(function (Builder $commentQuery) {
+                $commentQuery->doesntHave('reports')
+                    ->orWhereHas(
+                        'reports',
+                        function (Builder $reportQuery) {
+                        $reportQuery->where('status', '!=', ReportsType::APPROVED);
+                        }
+                    );
+            });
     }
 }

@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Post;
 use App\Models\PostComment;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PostCommentSeeder extends Seeder
@@ -16,10 +14,7 @@ class PostCommentSeeder extends Seeder
     {
         PostComment::factory()->count(40)->create();
 
-        $posts = Post::all();
-
         for ($i=0; $i < 60; $i++) {
-            //$randomPost = $posts->random()->id;
 
             $allComments = PostComment::all();
             $randomPost = $allComments->random()->post_id;
@@ -30,14 +25,6 @@ class PostCommentSeeder extends Seeder
                 ->get();
 
             $randomComment = $availableComments->random();
-
-
-            //$randomPost = rand(1,30);
-            //$randomParentComment = $this->randomParentComment($randomPost, $i);
-            //$comment = PostComment::query()->where('post_id', $randomPost)->firstOrFail();
-
-
-
 
             PostComment::factory()
                 ->set('post_id',$randomPost)
@@ -54,7 +41,9 @@ class PostCommentSeeder extends Seeder
         return $comment->random()->id;
 
         do {
-            $result = rand(0,2) === 1 ? rand(1,40 + $i) : null;
+            $result = rand(0,2) === 1
+                ? rand(1,40 + $i)
+                : null;
         } while ($result != $postId);
 
         return $result;

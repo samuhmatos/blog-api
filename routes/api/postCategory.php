@@ -3,7 +3,7 @@
 use App\Http\Controllers\PostCategoryController;
 use Illuminate\Support\Facades\Route;
 
-// Route::prefix('/category')->group(function (){
+// /api/category
     Route::get('', [PostCategoryController::class, 'paginate']);
     Route::get('/all', [PostCategoryController::class, 'index']);
     Route::get('/get/{slugOrId}', [PostCategoryController::class, 'show']);
@@ -15,6 +15,5 @@ use Illuminate\Support\Facades\Route;
         Route::delete('/{postCategory}', [PostCategoryController::class, 'destroy']);
     });
 
-// });
 
 ?>

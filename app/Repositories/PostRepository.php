@@ -72,13 +72,11 @@ class PostRepository extends Repository{
             ->with(['category', 'author'])
             ->withPostReactionCounts()
             ->where(function (Builder $query) use ($filterWeek){
-
                 if($filterWeek){
                     $startDate = Carbon::now()->startOfWeek();
                     $endDate = Carbon::now()->endOfWeek();
                     $query->whereBetween('created_at', [$startDate, $endDate]);
                 }
-
             })
             ->orderByDesc('like_count')
             ->orderBy('views', 'desc')
@@ -97,8 +95,6 @@ class PostRepository extends Repository{
                     $subQuery->where('slug', $categorySlug);
                 });
             })
-            // ->join('post_categories', 'post_categories.id', '=', 'posts.category_id')
-            // ->where('post_categories.slug', $categorySlug)
             ->orderByDesc('views')
             ->take($limit)
             ->get();
@@ -118,18 +114,13 @@ class PostRepository extends Repository{
             ->load(['comments' => function ($query) {
                 $query
                     ->whereNull('parent_id')
-                    ->with('user')
                     ->orderByDesc('updated_at')
                     ->orderByDesc('id')
-                    ->withReactionCounts()
-                    ->withUserReaction();
+                    ->withCommentToPublic();
             }, 'comments.answers' => function ($query) {
-                $query
-                    ->with('user')
-                    ->withReactionCounts()
-                    ->withUserReaction();
+                $query->withCommentToPublic();
             }]);
     }
-    
+
 
 }
